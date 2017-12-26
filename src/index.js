@@ -6,6 +6,8 @@ import Lobby from './lobby';
 import Board from './board';
 import registerServiceWorker from './registerServiceWorker';
 import * as firebase from 'firebase';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+
 var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 
 const firebaseConfig = require('./firebase.json');
@@ -65,7 +67,7 @@ class Game extends Component {
 			    <div
 			    	className="slide-component-container"
 			   		key={this.state.stage}>
-			   		<img alt="bg" src={require("./res/background.jpg")} />
+			   		<div className="image-wrapper"><img alt="bg" src={require("./res/background.jpg")} /></div>
 			   		{this.getComponent()}
 		   		</div>
 			</ReactCSSTransitionGroup>
@@ -73,8 +75,15 @@ class Game extends Component {
 	}
 }
 
+const App = () => (
+  <MuiThemeProvider>
+    <Game />
+  </MuiThemeProvider>
+);
+
+
 ReactDOM.render(
-	<Game />,
+	<App />,
 	document.getElementById('root')
 );
 

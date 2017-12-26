@@ -1,7 +1,8 @@
 $background-color: #fff;
 $off-white: #ddd;
+$red: #dd4b39;
 $byzantine-blue: #3457D5;
-$google-green: #34A853;
+$green: #34A853;
 
 @import url('https://fonts.googleapis.com/css?family=Roboto');
 
@@ -44,6 +45,7 @@ so they don't stack on-top of one another during
 animations
 */
 .slide-component-container {
+    overflow:hidden; // temporary
     position:absolute;
     top:0px;
     left:0px;
