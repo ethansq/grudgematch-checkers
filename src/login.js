@@ -115,13 +115,23 @@ class Login extends Component {
         });
     }
 
+    componentDidMount() {
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                this.props.onComplete();
+            } else {
+                console.log("Not authenticated");
+            }
+        });
+    }
+
     render() {
         var showProgress = (this.state.showProgress) ? "" : "hidden";
         var invalidEmail = (this.state.invalidEmail) ? "show" : "hidden";
         var invalidPassword = (this.state.invalidPassword) ? "show" : "hidden";
 
         return (
-            <div id="login" className="content">
+            <div id="login" className="container">
                 <div className={showProgress+" linear-progress"}>
                     <LinearProgress mode="indeterminate" />
                 </div>

@@ -55,12 +55,12 @@ animations
 }
 
 /*
-Most screens with a .side-bar will also have
+Some screens with a .side-bar will also have
 a content section 
 */
 .side-bar {
     background:$byzantine-blue;
-    width:2.5em;
+    width:12px;
     position:fixed;
     left:0px;
     top:0px;
