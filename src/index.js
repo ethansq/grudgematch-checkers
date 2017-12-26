@@ -5,6 +5,7 @@ import Login from './login';
 import Lobby from './lobby';
 import Board from './board';
 import registerServiceWorker from './registerServiceWorker';
+var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 
 require('./scss/base.scss');
 
@@ -21,19 +22,7 @@ class Game extends Component {
         this.handleLobbyComplete = this.handleLobbyComplete.bind(this);
 	}
 
-	handleLoginComplete() {
-		this.setState({
-			stage: 'lobby'
-		});
-	}
-
-	handleLobbyComplete() {
-		this.setState({
-			stage: 'board'
-		});
-	}
-
-	render() {
+	getComponent() {
 		if (this.state.stage === 'login') {
 			return (
 				<Login onComplete={this.handleLoginComplete} />
@@ -47,6 +36,31 @@ class Game extends Component {
 				<Board />
 			);
 		}
+	}
+
+	handleLoginComplete() {
+		this.setState({
+			stage: 'lobby'
+		});
+	}
+
+	handleLobbyComplete() {
+		this.setState({
+			stage: 'board'
+		});
+	}
+
+	render() {
+		return (
+			<ReactCSSTransitionGroup
+			    transitionName='slide'
+			    transitionEnterTimeout={1000}
+			    transitionLeaveTimeout={1000}
+			    component='div'>
+
+			    <div key={this.state.stage}>{this.getComponent()}</div>
+			</ReactCSSTransitionGroup>
+		);
 	}
 }
 

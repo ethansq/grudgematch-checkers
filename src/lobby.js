@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 
 class Lobby extends Component {
     constructor(props) {
@@ -32,26 +31,21 @@ class Lobby extends Component {
 
     render() {
         return (
-            <ReactCSSTransitionGroup transitionName = "fade"
-                transitionAppear = {true} transitionAppearTimeout = {777}
-                transitionLeave = {false} transitionEnter = {false}>
-
-                <div onClick={this.props.onComplete} className="container">
-                    <div className="side-bar">
-                    </div>
-                    <div id="choose-name" className="content">
-                        <form className="center" onSubmit={this.handleSubmit}>
-                            <input
-                                placeholder="CHOOSE A NAME"
-                                id="subscribeEmail"
-                                type="text"
-                                value={this.state.inputName}
-                                onChange={this.handleInputName} />
-                            <button type="submit" className="done-button arrow" value="Submit" />
-                        </form>
-                    </div>
+            <div onClick={this.props.onComplete} className="container">
+                <div className="side-bar">
                 </div>
-            </ReactCSSTransitionGroup>
+                <div id="choose-name" className="content">
+                    <form className="center" onSubmit={this.handleSubmit}>
+                        <input
+                            placeholder="CHOOSE A NAME"
+                            id="subscribeEmail"
+                            type="text"
+                            value={this.state.inputName}
+                            onChange={this.handleInputName} />
+                        <button type="submit" className="done-button arrow" value="Submit" />
+                    </form>
+                </div>
+            </div>
         );
     }
 }

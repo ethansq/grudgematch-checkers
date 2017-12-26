@@ -13,8 +13,7 @@ class Login extends Component {
 
     render() {
         return (
-        	<div
-    			onClick={this.props.onComplete}>
+        	<div onClick={this.props.onComplete}>
     			I'M THE LOGIN COMPNENT
 			</div>
         );
