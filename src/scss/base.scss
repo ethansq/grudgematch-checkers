@@ -50,6 +50,9 @@ a {
     position:relative;
 }
 
+/*
+Helper classes
+*/
 .center {
     position: absolute;
     left: 50%;
@@ -69,6 +72,32 @@ div.img-wrapper {
     }
 }
 
-@import 'splash';
-@import 'choose-name';
+.fade-appear {
+   opacity: 0;
+}
+
+.fade-appear.fade-appear-active {
+   opacity: 1;
+   transition: opacity 777ms ease-in;
+}
+
+.fade-enter {
+   opacity: 0;
+}
+
+.fade-enter.fade-enter-active {
+   opacity: 1;
+   transition: opacity 777ms ease-in;
+}
+
+.fade-leave {
+   opacity: 1;
+}
+
+.fade-leave.fade-leave-active {
+   opacity: 0.01;
+   transition: opacity 777ms ease-in;
+}
+
+@import 'login', 'lobby';
 @import 'font-awesome.min';
