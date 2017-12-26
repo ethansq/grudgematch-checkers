@@ -2,17 +2,20 @@ import React, { Component } from 'react';
 import * as firebase from 'firebase';
 import LinearProgress from 'material-ui/LinearProgress';
 
-/*
-*/
+const INVALID_EMAIL = "Please enter a valid e-mail address.";
+const WRONG_PASSWORD = "Your password was incorrect.";
+const INVALID_PASSWORD = "Please include a minimum of 6 characters.";
+
 class Login extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            inputEmail: '',
-            inputPassword: '',
+            inputEmail: 'admin@admin.com',
+            inputPassword: 'password',
             invalidEmail: false,
             invalidPassword: false,
+            passwordStatus: '',
             showProgress: false
         }
 
@@ -40,7 +43,8 @@ class Login extends Component {
             case 0: // reset
                 this.setState({
                     invalidEmail: false,
-                    invalidPassword: false
+                    invalidPassword: false,
+                    passwordStatus: ''
                 });
                 break;
             case 1: // invalid email
@@ -49,9 +53,14 @@ class Login extends Component {
                 });
                 break;
             case 2: // weak password, need 6 chars
-                console.log("hello");
                 this.setState({
                     invalidPassword: true
+                });
+                break;
+            case 3: // wrong password
+                this.setState({
+                    invalidPassword: true,
+                    passwordStatus: 'WRONG'
                 });
                 break;
         }
@@ -68,6 +77,10 @@ class Login extends Component {
         this.updateUI(0);
 
         firebase.auth().signInWithEmailAndPassword(this.state.inputEmail, this.state.inputPassword)
+        .then(() => {
+            this.toggleIndeterminateProgressBar(); // done auth, hide progress bar
+            this.props.onComplete();
+        })
         .catch((error) => {
             switch (error.code) {
                 case 'auth/wrong-password':
@@ -127,7 +140,11 @@ class Login extends Component {
                         placeholder="Password" id="inputPassword" type="password"
                         value={this.state.inputPassword} onChange={this.handleInputPasswordChange} />
                     <div className={invalidPassword+" invalid-password"}>
-                        Please enter a password with at least 6 characters.
+                        {
+                            this.state.passwordStatus === 'WRONG'
+                                ? WRONG_PASSWORD
+                                : INVALID_PASSWORD
+                        }
                     </div>
 
                     <div onClick={this.handleLoginSubmit} className="login-button">SIGN IN</div>
