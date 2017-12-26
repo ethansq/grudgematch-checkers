@@ -1,0 +1,8 @@
+{
+    "apiKey": "AIzaSyB5TsrISCcyVTKWK2Qt73Ah0CokPW-gmvw",
+    "authDomain": "grudgematch-checkers.firebaseapp.com",
+    "databaseURL": "https://grudgematch-checkers.firebaseio.com",
+    "projectId": "grudgematch-checkers",
+    "storageBucket": "grudgematch-checkers.appspot.com",
+    "messagingSenderId": "334270412406"
+}

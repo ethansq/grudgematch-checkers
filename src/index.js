@@ -5,7 +5,11 @@ import Login from './login';
 import Lobby from './lobby';
 import Board from './board';
 import registerServiceWorker from './registerServiceWorker';
+import * as firebase from 'firebase';
 var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
+
+const firebaseConfig = require('./firebase.json');
+firebase.initializeApp(firebaseConfig);
 
 require('./scss/base.scss');
 
