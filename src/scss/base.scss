@@ -15,6 +15,13 @@ body, html {
     font-family: 'Roboto', sans-serif;
 }
 
+// Prefer width = element width + padding + border
+*,
+*:after,
+*:before {
+  box-sizing: border-box;
+}
+
 h1,h2,h3,h4,h5,h6 {
 	margin: 0px;
 }
@@ -30,10 +37,24 @@ a {
 	}
 }
 
-/**
- * Most screens with a .side-bar
- * will also have a content section 
- */
+/*
+Make sure components align with each other horizontally,
+so they don't stack on-top of one another during
+animations
+*/
+.slide-component-container {
+    position:absolute;
+    top:0px;
+    left:0px;
+    background:#777;
+    width:100vw;
+    height:100vh;
+}
+
+/*
+Most screens with a .side-bar will also have
+a content section 
+*/
 .side-bar {
     background:$byzantine-blue;
     width:2.5em;
@@ -51,13 +72,15 @@ a {
 }
 
 /*
-Helper classes
+Helper classes for generic styles like centering
+and <img> tags
 */
 .center {
     position: absolute;
     left: 50%;
     top: 50%;
     -webkit-transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
 }
 
@@ -78,7 +101,7 @@ div.img-wrapper {
 
 .slide-enter.slide-enter-active {
   transform: translate(0%);
-  transition: transform 1000ms ease-in-out;
+  transition: transform 400ms ease-in-out;
 }
 
 .slide-leave {
@@ -87,7 +110,7 @@ div.img-wrapper {
 
 .slide-leave.slide-leave-active {
   transform: translate(-100%);
-  transition: transform 1000ms ease-in-out;
+  transition: transform 400ms ease-in-out;
 }
 
 @import 'login', 'lobby';

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 
 /*
 */

@@ -54,11 +54,13 @@ class Game extends Component {
 		return (
 			<ReactCSSTransitionGroup
 			    transitionName='slide'
-			    transitionEnterTimeout={1000}
-			    transitionLeaveTimeout={1000}
+			    transitionEnterTimeout={400}
+			    transitionLeaveTimeout={400}
 			    component='div'>
 
-			    <div key={this.state.stage}>{this.getComponent()}</div>
+			    <div 
+			    	className="slide-component-container"
+			   		key={this.state.stage}>{this.getComponent()}</div>
 			</ReactCSSTransitionGroup>
 		);
 	}
