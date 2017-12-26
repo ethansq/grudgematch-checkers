@@ -58,9 +58,12 @@ class Game extends Component {
 			    transitionLeaveTimeout={400}
 			    component='div'>
 
-			    <div 
+			    <div
 			    	className="slide-component-container"
-			   		key={this.state.stage}>{this.getComponent()}</div>
+			   		key={this.state.stage}>
+			   		<img alt="bg" src={require("./res/background.jpg")} />
+			   		{this.getComponent()}
+		   		</div>
 			</ReactCSSTransitionGroup>
 		);
 	}

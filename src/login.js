@@ -7,14 +7,45 @@ class Login extends Component {
         super(props);
 
         this.state = {
+            inputEmail: '',
+            inputPassword: ''
         }
+
+        this.handleInputEmailChange = this.handleInputEmailChange.bind(this);
+        this.handleInputPasswordChange = this.handleInputPasswordChange.bind(this);
+        this.handleLoginSubmit = this.handleLoginSubmit.bind(this);
+    }
+
+    handleInputEmailChange(event) {
+        this.setState({
+            inputEmail: event.target.value
+        });
+    }
+
+    handleInputPasswordChange(event) {
+        this.setState({
+            inputPassword: event.target.value
+        });
+    }
+
+    handleLoginSubmit(event) {
+        console.log("handleLoginSubmit");
     }
 
     render() {
         return (
-        	<div onClick={this.props.onComplete}>
-    			I'M THE LOGIN COMPNENT
-			</div>
+            <div id="login" className="content">
+                <form noValidate className="center">
+                    <input placeholder="E-mail Address" id="inputEmail" type="email"
+                        value={this.state.inputEmail} onChange={this.handleInputEmailChange} />
+                    <input placeholder="Password" id="inputPassword" type="password"
+                        value={this.state.inputPassword} onChange={this.handleInputPasswordChange} />
+                    <div onClick={this.handleLoginSubmit} className="login-button">SIGN IN</div>
+                    <div className="message">
+                        Don't worry, we only use your e-mail for identification purposes.
+                    </div>
+                </form>
+            </div>
         );
     }
 }
