@@ -79,7 +79,8 @@ class Login extends Component {
         firebase.auth().signInWithEmailAndPassword(this.state.inputEmail, this.state.inputPassword)
         .then(() => {
             this.toggleIndeterminateProgressBar(); // done auth, hide progress bar
-            this.props.onComplete();
+            console.log("1");
+            this.props.onComplete(false);
         })
         .catch((error) => {
             switch (error.code) {
@@ -101,8 +102,12 @@ class Login extends Component {
     createNewUserAndAuthenticate(email, password) {
         firebase.auth().createUserWithEmailAndPassword(email, password)
         .then(() => {
-            this.toggleIndeterminateProgressBar(); // done auth, hide progress bar
-            this.props.onComplete();
+            // Once account is created, log in
+            firebase.auth().signInWithEmailAndPassword(email, password)
+            .then(() => {
+                this.toggleIndeterminateProgressBar(); // done auth, hide progress bar
+                this.props.onComplete(true);
+            });
         })
         .catch((error) => {
             this.toggleIndeterminateProgressBar();
@@ -116,12 +121,14 @@ class Login extends Component {
     }
 
     componentDidMount() {
-        firebase.auth().onAuthStateChanged((user) => {
+        var unsub = firebase.auth().onAuthStateChanged((user) => {
             if (user) {
-                this.props.onComplete();
+                console.log("Authentication persisted");
+                this.props.onComplete(false);
             } else {
                 console.log("Not authenticated");
             }
+            unsub();
         });
     }
 

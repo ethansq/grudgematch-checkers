@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Component } from 'react';
 import Login from './login';
+import ChooseName from './choose-name';
 import Lobby from './lobby';
 import Board from './board';
 import registerServiceWorker from './registerServiceWorker';
@@ -21,17 +22,21 @@ class Game extends Component {
 
 		this.state = {
 			stage: 'login', // 'lobby', 'board'
-
 		}
 
         this.handleLoginComplete = this.handleLoginComplete.bind(this);
         this.handleLobbyComplete = this.handleLobbyComplete.bind(this);
+        this.handleChooseNameComplete = this.handleChooseNameComplete.bind(this);
 	}
 
 	getComponent() {
 		if (this.state.stage === 'login') {
 			return (
 				<Login onComplete={this.handleLoginComplete} />
+			);
+		} else if (this.state.stage === 'choose-name') {
+			return (
+				<ChooseName onComplete={this.handleChooseNameComplete} />
 			);
 		} else if (this.state.stage === 'lobby') {
 			return (
@@ -44,9 +49,15 @@ class Game extends Component {
 		}
 	}
 
-	handleLoginComplete() {
+	handleChooseNameComplete() {
 		this.setState({
 			stage: 'lobby'
+		});
+	}
+
+	handleLoginComplete(createdNewUser) {
+		this.setState({
+			stage: createdNewUser ? 'choose-name' : 'lobby'
 		});
 	}
 
