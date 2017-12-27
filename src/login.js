@@ -79,7 +79,6 @@ class Login extends Component {
         firebase.auth().signInWithEmailAndPassword(this.state.inputEmail, this.state.inputPassword)
         .then(() => {
             this.toggleIndeterminateProgressBar(); // done auth, hide progress bar
-            console.log("1");
             this.props.onComplete(false);
         })
         .catch((error) => {

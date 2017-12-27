@@ -4,7 +4,7 @@ import { Component } from 'react';
 import Login from './login';
 import ChooseName from './choose-name';
 import Lobby from './lobby';
-import Board from './board';
+import Checkers from './checkers';
 import registerServiceWorker from './registerServiceWorker';
 import * as firebase from 'firebase';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -21,7 +21,7 @@ class Game extends Component {
 		super(props);
 
 		this.state = {
-			stage: 'login', // 'lobby', 'board'
+			stage: 'login', // 'lobby', 'checkers'
 		}
 
         this.handleLoginComplete = this.handleLoginComplete.bind(this);
@@ -30,6 +30,8 @@ class Game extends Component {
 	}
 
 	getComponent() {
+		return <Checkers />; // @TESTING
+
 		if (this.state.stage === 'login') {
 			return (
 				<Login onComplete={this.handleLoginComplete} />
@@ -42,9 +44,9 @@ class Game extends Component {
 			return (
 				<Lobby onComplete={this.handleLobbyComplete} />
 			);
-		} else if (this.state.stage === 'board') {
+		} else if (this.state.stage === 'checkers') {
 			return (
-				<Board />
+				<Checkers />
 			);
 		}
 	}
@@ -63,7 +65,7 @@ class Game extends Component {
 
 	handleLobbyComplete() {
 		this.setState({
-			stage: 'board'
+			stage: 'checkers'
 		});
 	}
 
