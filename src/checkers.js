@@ -62,6 +62,8 @@ class Board extends Component {
         this.renderCell = this.renderCell.bind(this);
         this.renderRow = this.renderRow.bind(this);
         this.handleCellClick = this.handleCellClick.bind(this);
+        this.handleMove = this.handleMove.bind(this);
+        this.handleSelectCell = this.handleSelectCell.bind(this);
     }
 
     renderCell(i) {
@@ -101,53 +103,85 @@ class Board extends Component {
         return Math.abs(r1 - r2);
     }
 
+    handleSelectCell(i) {
+        console.log(this.state.cells);
+        var colour = this.state.cells[i].colour;
+        var auxiliary = [i-9, i-18, i-7, i-14, i+7, i+14, i+9, i+18];
+        var remove = [];
+
+        // check which auxiliary locations we need to eliminate (no pieces to jump,
+        // space is already occupied, etc)
+        for (var p=0; p<8; p++) {
+            if (auxiliary[p] < 0 || auxiliary[p] > 63) { // space needs to be on the board
+                remove.push(p);
+            } else if (this.state.cells[auxiliary[p]] !== null) { // space needs to be empty
+                remove.push(p);
+            } else if (p % 2 !== 0 &&
+                (this.state.cells[auxiliary[p-1]] === null // outer cells need a piece to jump over
+                    || this.state.cells[auxiliary[p-1]].colour === colour)) { // and we can't eat friendlies
+                remove.push(p);
+            } else if (p % 2 === 1 && this.rowsApart(i, auxiliary[p]) !== 2) {
+                remove.push(p);
+            } else if (p % 2 === 0 && this.rowsApart(i, auxiliary[p]) !== 1) {
+                remove.push(p);
+            }
+        }
+
+        var n = remove.length;
+        for (var p=0; p<n; p++) {
+            auxiliary.splice(remove[p]-p, 1);
+        }
+
+        this.setState({
+            selected: i,
+            auxiliary: auxiliary
+        });
+    }
+
     /*
-    i: the index of the destination for the piece
+    i: the index of the destination for the piece. Players can only click a cell to
+    trigger handleMove() if the cell is an auxiliary cell. This means we don't
+    have to check if the cell is actually empty, etc.
     */
     handleMove(i) {
-        var original = this.state.selected;
-        // check for pieces to kill
+        var _from = this.state.selected;
+        var _dest = i;
+
+        console.log(_from);
+        console.log(_dest);
+
+        const inner = [-9, -7, 7, 9];
+        const outer = [-18, -14, 14, 18];
+
+        if (outer.indexOf(_dest - _from) !== -1) { // if dest is an outer cell, remove the killed piece
+            this.state.cells[_from + inner[outer.indexOf(_dest - _from)]] = null;
+        }
+
+        var cells = this.state.cells.slice();
+        console.log(cells);
+
+        cells[_dest] = cells[_from]; // move piece
+        cells[_from] = null; // delete piece from old position
+        console.log(cells);
+
+        this.setState(
+            {cells: cells}, // update cells
+            () => { // once state is updated, also update the current selection
+                this.handleSelectCell(_dest);
+            }
+        );
+
     }
 
     handleCellClick(i) {
         // if we're clicking a friendly piece, "select" that piece
         // using 'r' default for now
         if (this.state.cells[i] !== null && this.state.cells[i].colour === 'r') {
-            var colour = this.state.cells[i].colour;
-            var auxiliary = [i-9, i-18, i-7, i-14, i+7, i+14, i+9, i+18];
-            var remove = [];
-
-            // check which auxiliary locations we need to eliminate (no pieces to jump,
-            // space is already occupied, etc)
-            for (var p=0; p<8; p++) {
-                if (auxiliary[p] < 0 || auxiliary[p] > 63) { // space needs to be on the board
-                    remove.push(p);
-                } else if (this.state.cells[auxiliary[p]] !== null) { // space needs to be empty
-                    remove.push(p);
-                } else if (p % 2 !== 0 &&
-                    (this.state.cells[auxiliary[p-1]] === null // outer cells need a piece to jump over
-                        || this.state.cells[auxiliary[p-1]].colour === colour)) { // and we can't eat friendlies
-                    remove.push(p);
-                } else if (p % 2 === 1 && this.rowsApart(i, auxiliary[p]) !== 2) {
-                    remove.push(p);
-                } else if (p % 2 === 0 && this.rowsApart(i, auxiliary[p]) !== 1) {
-                    remove.push(p);
-                }
-            }
-
-            var n = remove.length;
-            for (var p=0; p<n; p++) {
-                auxiliary.splice(remove[p]-p, 1);
-            }
-
-            this.setState({
-                selected: i,
-                auxiliary: auxiliary
-            });
+            this.handleSelectCell(i);
         }
         // if we're clicking to move a piece, perform the move
         else if (this.state.auxiliary.indexOf(i) !== -1) {
-            handleMove(i);
+            this.handleMove(i);
         }
         // if we're clicking an empty space, de-select
         else {
