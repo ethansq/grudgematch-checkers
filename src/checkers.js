@@ -30,6 +30,9 @@ function Cell(props) {
     );
 }
 
+/*
+Each piece has a colour and a king status, which allows it to move backwards
+*/
 function Piece(colour, king) {
     this.colour = colour;
     this.king = king;
@@ -40,8 +43,10 @@ class Board extends Component {
         super(props);
 
         var cells = [];
-        var b = [8, 1, 17, 10, 3, 19, 12, 5, 21, 14, 7, 23];
-        var r = [40, 56, 49, 42, 58, 51, 44, 60, 53, 46, 62, 55];
+        // var b = [8, 1, 17, 10, 3, 19, 12, 5, 21, 14, 7, 23];
+        // var r = [40, 56, 49, 42, 58, 51, 44, 60, 53, 46, 62, 55];
+        var b = [26, 28]; // @TEST
+        var r = [35]; // @TEST
 
         for (var i=0; i<64; i++) {
             if (b.indexOf(i) !== -1) {
@@ -97,6 +102,10 @@ class Board extends Component {
         );
     }
 
+    /*
+    Helper to determine how many rows apart two cells are. This helps us maintain
+    structure of moves (diagonal only)
+    */
     rowsApart(i1, i2) {
         var r1 = Math.floor(i1 / 8);
         var r2 = Math.floor(i2 / 8);
@@ -107,34 +116,32 @@ class Board extends Component {
         console.log(this.state.cells);
         var colour = this.state.cells[i].colour;
         var auxiliary = [i-9, i-18, i-7, i-14, i+7, i+14, i+9, i+18];
-        var remove = [];
 
         // check which auxiliary locations we need to eliminate (no pieces to jump,
         // space is already occupied, etc)
-        for (var p=0; p<8; p++) {
-            if (auxiliary[p] < 0 || auxiliary[p] > 63) { // space needs to be on the board
-                remove.push(p);
-            } else if (this.state.cells[auxiliary[p]] !== null) { // space needs to be empty
-                remove.push(p);
-            } else if (p % 2 !== 0 &&
-                (this.state.cells[auxiliary[p-1]] === null // outer cells need a piece to jump over
-                    || this.state.cells[auxiliary[p-1]].colour === colour)) { // and we can't eat friendlies
-                remove.push(p);
-            } else if (p % 2 === 1 && this.rowsApart(i, auxiliary[p]) !== 2) {
-                remove.push(p);
-            } else if (p % 2 === 0 && this.rowsApart(i, auxiliary[p]) !== 1) {
-                remove.push(p);
+        var _auxiliary = auxiliary.map((ele, index) => {
+            if (false
+                // our rules chart for determining whether a cell is a valid destination
+                // or not
+                || (ele < 0 || ele > 63) // space needs to be on the board
+                || (this.state.cells[ele] !== null) // space needs to be empty
+                || (index % 2 !== 0 &&
+                        (this.state.cells[auxiliary[index-1]] === null || // outer cells need a piece to jump over
+                            this.state.cells[auxiliary[index-1]].colour === colour) // and we can't eat friendlies
+                        )
+                || (index % 2 === 1 && this.rowsApart(i, ele) !== 2)
+                || (index % 2 === 0 && this.rowsApart(i, ele) !== 1)
+                || ((colour === 'r' && ele > i) && !this.state.cells[i].king) // non-kings cannot move backwards
+                || ((colour === 'b' && ele < i) && !this.state.cells[i].king)
+            ) {
+                return -1;
             }
-        }
-
-        var n = remove.length;
-        for (var p=0; p<n; p++) {
-            auxiliary.splice(remove[p]-p, 1);
-        }
+            return ele;
+        });
 
         this.setState({
             selected: i,
-            auxiliary: auxiliary
+            auxiliary: _auxiliary
         });
     }
 
@@ -147,9 +154,6 @@ class Board extends Component {
         var _from = this.state.selected;
         var _dest = i;
 
-        console.log(_from);
-        console.log(_dest);
-
         const inner = [-9, -7, 7, 9];
         const outer = [-18, -14, 14, 18];
 
@@ -158,11 +162,8 @@ class Board extends Component {
         }
 
         var cells = this.state.cells.slice();
-        console.log(cells);
-
         cells[_dest] = cells[_from]; // move piece
         cells[_from] = null; // delete piece from old position
-        console.log(cells);
 
         this.setState(
             {cells: cells}, // update cells
