@@ -63,7 +63,8 @@ class Board extends Component {
             cells: cells,
             selected: null, // index of selected piece
             auxiliary: [], // options based on the selected piece
-            active: null
+            active: null,
+            ongoing: true
         };
 
         // bindings
@@ -123,10 +124,15 @@ class Board extends Component {
         // check which auxiliary locations we need to eliminate (no pieces to jump,
         // space is already occupied, etc)
         var _auxiliary = auxiliary.map((ele, index) => {
-            if (this.state.active !== null) {
+            // turn is over
+            if (!this.state.ongoing) {
+                return -1;
+            }
+            // turn is still ongoing, but a piece is 'active'
+            else if (this.state.active !== null) {
                 // must be within bounds
                 if (ele < 0 || ele > 63) {
-
+                    return -1;
                 }
                 // while active, inner moves are not allowed
                 else if (index % 2 === 0) {
@@ -187,6 +193,8 @@ class Board extends Component {
 
         // copy the board
         var cells = this.state.cells.slice();
+        // if dest is inner cell, cannot make further moves
+        var normal = inner.indexOf(_dest - _from) !== -1;
         // if the piece has reached the end of the board, promote to king
         var promote =
             (this.state.cells[_from].colour === 'r' && _dest < 8) ||
@@ -196,13 +204,16 @@ class Board extends Component {
         cells[_from] = null; // delete piece from old position
         cells[_dest].king = promote;
 
+
         this.setState(
             {
                 // update cells
                 cells: cells,
                 // piece is now active. Only this piece can move, and any subsequent
                 // moves must be kills
-                active: _dest
+                active: _dest,
+                // if it was a normal move, turn is over
+                ongoing: !normal
             },
             () => { // once state is updated, also update the current selection
                 this.handleSelectCell(_dest);
@@ -232,7 +243,7 @@ class Board extends Component {
                 selected: null,
                 auxiliary: [],
                 active: null
-            })
+            });
         }
     }
 
