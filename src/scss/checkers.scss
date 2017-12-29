@@ -1,11 +1,15 @@
 #checkers.container {
-	width:70%;
+	width:100%;
 	margin:0 auto;
 
 	/*
 	board css specifically for this game mode
 	*/
 	.board {
+		display:inline-block;
+		margin-left:2%;
+		margin-right:8%;
+
 		.board-row {
 			.cell {
 				width:12.5%;
@@ -43,13 +47,103 @@
 			max-height:100%;
 		}
 	}
+
+	.buttons {
+		margin:0 auto;
+		width:75.6%;
+		margin-top:24px;
+
+		> .btn {
+			width:46%;
+			height:48px;
+			display:inline-block;
+			position:relative;
+
+            border-radius:3px;
+            -webkit-border-radius:3px;
+            -moz-border-radius:3px;
+        	box-shadow:0px 2px 8px -4px;
+
+        	&:active {
+        		opacity:0.8;
+        		box-shadow:none !important;
+        	}
+
+			&.undo {
+				background:$byzantine-blue;
+				margin-right:8%;
+
+				> div {
+					font-size:14px; // the FontAwesome undo icon is a little big
+				}
+			}
+
+			&.done {
+				background:$green;
+			}
+
+			&.disabled {
+				opacity:0.5;
+				background:#abc;
+				box-shadow: none !important;
+			}
+		}
+	}
+
+	.w90 {
+		width:90%;
+		margin:0 auto;
+	}
+
+	.board-section {
+		width:100%;
+		text-align:center;
+		position:relative;
+
+		.r-dead, .bl-dead {
+			width:6%;
+			display:inline-block;
+
+			.wrapper {
+				margin-top:4px;
+				position:relative;
+				width:100%;
+
+				&:after {
+					content:"";
+					display:block;
+					padding-bottom:100%;
+				}
+
+				img {
+					position:absolute;
+					vertical-align:top;
+					left:0px;
+					top:0px;
+					width:100%;
+					height:100%;
+				}
+			}
+		}
+
+		.r-dead {
+			position:absolute;
+			right:0px;
+
+			-webkit-transform: rotate(180deg);     /* Chrome and other webkit browsers */
+			-moz-transform: rotate(180deg);        /* FF */
+			-o-transform: rotate(180deg);          /* Opera */
+			-ms-transform: rotate(180deg);         /* IE9 */
+			transform: rotate(180deg);    
+		}
+	}
 }
 
 /*
 Generic board css; backgrounds, colours, etc
 */
 .board {
-	width:100%;
+	width:84%;
 
 	.board-row {
 		display:flex;

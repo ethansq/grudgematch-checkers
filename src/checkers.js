@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+var FontAwesome = require('react-fontawesome');
 
 const BLACK_PIECE = require("./res/ch-bl-piece.png");
 const RED_PIECE = require("./res/ch-r-piece.png");
@@ -65,11 +66,14 @@ class Board extends Component {
         }
 
         this.state = {
+            turn: 'r',
+            dead: ['r', 'r', 'blk', 'blk', 'bl', 'rk'], // helper array to keep track of how many to show in the dead pile
             cells: cells,
             selected: null, // index of selected piece
             auxiliary: [], // options based on the selected piece
             active: null,
-            ongoing: true
+            ongoing: true,
+            history: []
         };
 
         // bindings
@@ -78,6 +82,8 @@ class Board extends Component {
         this.handleCellClick = this.handleCellClick.bind(this);
         this.handleMove = this.handleMove.bind(this);
         this.handleSelectCell = this.handleSelectCell.bind(this);
+        this.handleTurnEnd = this.handleTurnEnd.bind(this);
+        this.handleUndo = this.handleUndo.bind(this);
     }
 
     renderCell(i) {
@@ -121,7 +127,6 @@ class Board extends Component {
     }
 
     handleSelectCell(i) {
-        console.log(this.state.cells);
         var colour = this.state.cells[i].colour;
         var auxiliary = [i-9, i-18, i-7, i-14, i+7, i+14, i+9, i+18];
 
@@ -184,6 +189,17 @@ class Board extends Component {
     have to check if the cell is actually empty, etc.
     */
     handleMove(i) {
+        console.log(this.state);
+        var _history = this.state.history.slice();
+        _history.push({
+            active: this.state.active,
+            auxiliary: this.state.auxiliary,
+            cells: this.state.cells.slice(),
+            ongoing: this.state.ongoing,
+            selected: this.state.selected,
+            // turn: this.state.turn
+        });
+
         var _from = this.state.selected;
         var _dest = i;
 
@@ -192,6 +208,10 @@ class Board extends Component {
 
         // if dest is an outer cell, remove the killed piece
         if (outer.indexOf(_dest - _from) !== -1) {
+            var piece = this.state.cells[_from + inner[outer.indexOf(_dest - _from)]].colour;
+            piece = piece + this.state.cells[_from + inner[outer.indexOf(_dest - _from)]].king ? 'k' : '';
+            this.state.dead.push(piece);
+
             this.state.cells[_from + inner[outer.indexOf(_dest - _from)]] = null;
         }
 
@@ -208,7 +228,6 @@ class Board extends Component {
         cells[_from] = null; // delete piece from old position
         cells[_dest].king = promote ? true : cells[_dest].king;
 
-
         this.setState(
             {
                 // update cells
@@ -217,7 +236,9 @@ class Board extends Component {
                 // moves must be kills
                 active: _dest,
                 // if it was a normal move, turn is over
-                ongoing: !normal
+                ongoing: !normal,
+                // set our updated history list
+                history: _history
             },
             () => { // once state is updated, also update the current selected piece/cell
                 this.handleSelectCell(_dest);
@@ -238,7 +259,7 @@ class Board extends Component {
         }
         // if we're clicking a friendly piece, "select" that piece
         // using 'r' default for now
-        else if (this.state.cells[i] !== null && this.state.cells[i].colour === 'r') {
+        else if (this.state.cells[i] !== null && this.state.cells[i].colour === this.state.turn) {
             this.handleSelectCell(i);
         }
         // if we're clicking an empty space, de-select
@@ -251,15 +272,103 @@ class Board extends Component {
         }
     }
 
+    /*
+    Can only end turn if a piece has made a move (cannot pass)
+    Also, once a turn is locked in, can no longer undo
+    */
+    handleTurnEnd() {
+        // Can only end turn if a piece has made a move (cannot pass)
+        // Also
+        if (this.state.active) {
+            this.setState({
+                selected: null,
+                auxiliary: [],
+                active: null,
+                ongoing: true,
+                turn: this.state.turn === 'r' ? 'b' : 'r',
+                history: [],
+                moves: 0
+            });
+        }
+    }
+
+    /*
+    Pop a state from our history list and apply it to our current state
+    */
+    handleUndo() {
+        if (this.state.history.length > 0) {
+            var history = this.state.history.pop();
+            this.setState({
+                active: history.active,
+                auxiliary: history.auxiliary,
+                cells: history.cells.slice(),
+                ongoing: history.ongoing,
+                selected: history.selected
+            });
+        }
+    }
+
     render() {
+        // initialize our rows
         var rows = [];
         for (var i=0; i<8; i++) {
             rows[i] = this.renderRow(i);
         }
 
+        var blDead = [];
+        var rDead = [];
+        // initialize our dead pile(s)
+        this.state.dead.map((e, i) => {
+            if (e === 'r' || e === 'rk') {
+                rDead.push(
+                    <div key={i} className="wrapper">
+                        <img
+                            className="dead-piece"
+                            src={e === 'rk' ? RED_KING : RED_PIECE}
+                            alt="piece" />
+                    </div>
+                );
+            } else {
+                blDead.push(
+                    <div key={i} className="wrapper">
+                        <img
+                            className="dead-piece"
+                            src={e === 'blk' ? BLACK_KING : BLACK_PIECE}
+                            alt="piece" />
+                    </div>
+                );
+            }
+        });
+
         return (
-            <div className="board">
-                {rows}
+            <div className="wrapper">
+                <div className="w90">
+                    <div className="board-section">
+                        <div className="bl-dead">{blDead}</div>
+                        <div className="board">
+                            {rows}
+                        </div>
+                        <div className="r-dead">{rDead}</div>
+                    </div>
+                </div>
+                <div className="buttons">
+                    <div
+                        className={"btn undo "+(this.state.history.length > 0 ? "" : "disabled")}
+                        onClick={this.handleUndo}>
+                        <div className="center"><FontAwesome
+                            name='undo'
+                            size='2x'
+                            inverse/></div>
+                    </div>
+                    <div
+                        className={"btn done "+(this.state.active ? "" : "disabled")}
+                        onClick={this.handleTurnEnd}>
+                        <div className="center"><FontAwesome
+                            name='check-circle'
+                            size='2x'
+                            inverse/></div>
+                    </div>
+                </div>
             </div>
         );
     }
