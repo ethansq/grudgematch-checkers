@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import * as firebase from 'firebase';
 
 class ChooseName extends Component {
     constructor(props) {
@@ -6,7 +7,7 @@ class ChooseName extends Component {
 
         this.state = {
             inputName: 'Turtleneck',
-            invalidName: false
+            invalidName: false,
         }
 
         this.handleInputName = this.handleInputName.bind(this);
@@ -32,7 +33,15 @@ class ChooseName extends Component {
             return;
         }
 
-        this.props.onComplete();
+        this.props.toggleProgressBar(); // show progress bar
+
+        // Update Firebase with the input name
+        var db = firebase.database().ref();
+        db.child(firebase.auth().currentUser.uid).child("name").set(inputName)
+        .then(() => {
+            this.props.toggleProgressBar(); // hide progress bar
+            this.props.onComplete(); // complete this screen
+        });
     }
 
     updateUI(status) {

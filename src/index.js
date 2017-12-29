@@ -8,12 +8,15 @@ import Checkers from './checkers';
 import registerServiceWorker from './registerServiceWorker';
 import * as firebase from 'firebase';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import LinearProgress from 'material-ui/LinearProgress';
 
 var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 
+// Firebase configurations
 const firebaseConfig = require('./firebase.json');
 firebase.initializeApp(firebaseConfig);
 
+// Import our SCSS
 require('./scss/base.scss');
 
 class Game extends Component {
@@ -22,31 +25,39 @@ class Game extends Component {
 
 		this.state = {
 			stage: 'login', // 'lobby', 'checkers'
+			showProgress: false
 		}
 
         this.handleLoginComplete = this.handleLoginComplete.bind(this);
         this.handleLobbyComplete = this.handleLobbyComplete.bind(this);
         this.handleChooseNameComplete = this.handleChooseNameComplete.bind(this);
+        this.toggleIndeterminateProgressBar = this.toggleIndeterminateProgressBar.bind(this);
 	}
 
 	getComponent() {
-		return <Checkers />; // @TESTING
-
 		if (this.state.stage === 'login') {
 			return (
-				<Login onComplete={this.handleLoginComplete} />
+				<Login
+					toggleProgressBar={this.toggleIndeterminateProgressBar}
+					onComplete={this.handleLoginComplete} />
 			);
 		} else if (this.state.stage === 'choose-name') {
 			return (
-				<ChooseName onComplete={this.handleChooseNameComplete} />
+				<ChooseName
+					toggleProgressBar={this.toggleIndeterminateProgressBar}
+					onComplete={this.handleChooseNameComplete} />
 			);
 		} else if (this.state.stage === 'lobby') {
 			return (
-				<Lobby onComplete={this.handleLobbyComplete} />
+				<Lobby
+					toggleProgressBar={this.toggleIndeterminateProgressBar}
+					onComplete={this.handleLobbyComplete} />
 			);
 		} else if (this.state.stage === 'checkers') {
 			return (
-				<Checkers />
+				<Checkers
+					roomId={this.state.roomId}
+					toggleProgressBar={this.toggleIndeterminateProgressBar} />
 			);
 		}
 	}
@@ -59,17 +70,27 @@ class Game extends Component {
 
 	handleLoginComplete(createdNewUser) {
 		this.setState({
-			stage: createdNewUser ? 'choose-name' : 'lobby'
+			// stage: createdNewUser ? 'choose-name' : 'lobby'
+			stage: 'choose-name' // @TEST
 		});
 	}
 
-	handleLobbyComplete() {
+	handleLobbyComplete(roomId) {
 		this.setState({
+			roomId: roomId,
 			stage: 'checkers'
 		});
 	}
 
+    toggleIndeterminateProgressBar() {
+        this.setState({
+            showProgress: !this.state.showProgress
+        })
+    }
+
 	render() {
+        var showProgress = (this.state.showProgress) ? "" : "hidden";
+
 		return (
 			<ReactCSSTransitionGroup
 			    transitionName='slide'
@@ -80,6 +101,11 @@ class Game extends Component {
 			    <div
 			    	className="slide-component-container"
 			   		key={this.state.stage}>
+            
+	                <div className={showProgress+" linear-progress"}>
+	                    <LinearProgress mode="indeterminate" />
+	                </div>
+
 			   		<div className="image-wrapper"><img alt="bg" src={require("./res/background.jpg")} /></div>
 			   		{this.getComponent()}
 		   		</div>

@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import * as firebase from 'firebase';
+
 var FontAwesome = require('react-fontawesome');
 
 const BLACK_PIECE = require("./res/ch-bl-piece.png");
@@ -36,39 +38,15 @@ function Cell(props) {
     );
 }
 
-/*
-Each piece has a colour and a king status, which allows it to move backwards
-*/
-function Piece(colour, king) {
-    this.colour = colour;
-    this.king = king;
-}
-
 class Board extends Component {
     constructor(props) {
         super(props);
 
-        // default board with starting positions
-        var cells = [];
-        // var b = [8, 1, 17, 10, 3, 19, 12, 5, 21, 14, 7, 23];
-        // var r = [40, 56, 49, 42, 58, 51, 44, 60, 53, 46, 62, 55];
-        var b = [26, 28, 12, 14]; // @TEST
-        var r = [35, 37]; // @TEST
-
-        for (var i=0; i<64; i++) {
-            if (b.indexOf(i) !== -1) {
-                cells[i] = new Piece('b', false);
-            } else if (r.indexOf(i) !== -1) {
-                cells[i] = new Piece('r', false);
-            } else {
-                cells[i] = null;
-            }
-        }
-
         this.state = {
             turn: 'r',
-            dead: ['r', 'r', 'blk', 'blk', 'bl', 'rk'], // helper array to keep track of how many to show in the dead pile
-            cells: cells,
+            // @TEST
+            dead: [], // helper array to keep track of how many to show in the dead pile
+            cells: [],
             selected: null, // index of selected piece
             auxiliary: [], // options based on the selected piece
             active: null,
@@ -84,6 +62,19 @@ class Board extends Component {
         this.handleSelectCell = this.handleSelectCell.bind(this);
         this.handleTurnEnd = this.handleTurnEnd.bind(this);
         this.handleUndo = this.handleUndo.bind(this);
+
+        this.props.toggleProgressBar();
+    }
+
+    componentWillMount() {
+        // Fetch the board from Firebase
+        var db = firebase.database().ref();
+        db.child('rooms').child(this.props.roomId).child('state').once('value', (snapshot) => {
+            this.setState(snapshot.val(), () => {
+                console.log(this.state);
+            });
+            this.props.toggleProgressBar();
+        });
     }
 
     renderCell(i) {
@@ -95,8 +86,8 @@ class Board extends Component {
             <Cell
                 key={"cell-"+i}
                 highlight={this.state.auxiliary.indexOf(i) !== -1}
-                value={this.state.cells[i] !== null ? this.state.cells[i].colour : null}
-                king={this.state.cells[i] !== null ?this.state.cells[i].king : null}
+                value={this.state.cells[i] !== -1 ? this.state.cells[i].colour : null}
+                king={this.state.cells[i] !== -1 ?this.state.cells[i].king : null}
                 selected={this.state.selected === i}
                 onClick={() => this.handleCellClick(i)} />
         );
@@ -147,13 +138,13 @@ class Board extends Component {
                 else if (index % 2 === 0) {
                     return -1;
                 } else {
-                    if (this.state.cells[auxiliary[index-1]] === null || // if no piece to kill, cannot move to this dest
+                    if (this.state.cells[auxiliary[index-1]] === -1 || // if no piece to kill, cannot move to this dest
                             this.state.cells[auxiliary[index-1]].colour === colour) { // cannot kill friendlies
                         return -1;
                     }
                     // unless this piece is a king, can only kill forwards
                     else if (((colour === 'r' && ele > i) && !this.state.cells[i].king)
-                        || ((colour === 'b' && ele < i) && !this.state.cells[i].king)) {
+                        || ((colour === 'bl' && ele < i) && !this.state.cells[i].king)) {
                         return -1;
                     }
                     return ele;
@@ -162,15 +153,15 @@ class Board extends Component {
                 // our rules chart for determining whether a cell is a valid destination
                 // or not
                 || (ele < 0 || ele > 63) // space needs to be on the board
-                || (this.state.cells[ele] !== null) // space needs to be empty
+                || (this.state.cells[ele] !== -1) // space needs to be empty
                 || (index % 2 !== 0 &&
-                        (this.state.cells[auxiliary[index-1]] === null || // outer cells need a piece to jump over
+                        (this.state.cells[auxiliary[index-1]] === -1 || // outer cells need a piece to jump over
                             this.state.cells[auxiliary[index-1]].colour === colour) // and we can't eat friendlies
                         )
                 || (index % 2 === 1 && this.rowsApart(i, ele) !== 2)
                 || (index % 2 === 0 && this.rowsApart(i, ele) !== 1)
                 || ((colour === 'r' && ele > i) && !this.state.cells[i].king) // non-kings cannot move backwards
-                || ((colour === 'b' && ele < i) && !this.state.cells[i].king)
+                || ((colour === 'bl' && ele < i) && !this.state.cells[i].king)
             ) {
                 return -1;
             }
@@ -189,7 +180,6 @@ class Board extends Component {
     have to check if the cell is actually empty, etc.
     */
     handleMove(i) {
-        console.log(this.state);
         var _history = this.state.history.slice();
         _history.push({
             active: this.state.active,
@@ -212,7 +202,7 @@ class Board extends Component {
             piece = piece + this.state.cells[_from + inner[outer.indexOf(_dest - _from)]].king ? 'k' : '';
             this.state.dead.push(piece);
 
-            this.state.cells[_from + inner[outer.indexOf(_dest - _from)]] = null;
+            this.state.cells[_from + inner[outer.indexOf(_dest - _from)]] = -1;
         }
 
         // copy the board
@@ -222,10 +212,10 @@ class Board extends Component {
         // if the piece has reached the end of the board, promote to king
         var promote =
             (this.state.cells[_from].colour === 'r' && _dest < 8) ||
-                (this.state.cells[_from].colour === 'b' && _dest > 55);
+                (this.state.cells[_from].colour === 'bl' && _dest > 55);
 
         cells[_dest] = cells[_from]; // move piece
-        cells[_from] = null; // delete piece from old position
+        cells[_from] = -1; // delete piece from old position
         cells[_dest].king = promote ? true : cells[_dest].king;
 
         this.setState(
@@ -259,7 +249,7 @@ class Board extends Component {
         }
         // if we're clicking a friendly piece, "select" that piece
         // using 'r' default for now
-        else if (this.state.cells[i] !== null && this.state.cells[i].colour === this.state.turn) {
+        else if (this.state.cells[i] !== -1 && this.state.cells[i].colour === this.state.turn) {
             this.handleSelectCell(i);
         }
         // if we're clicking an empty space, de-select
@@ -285,7 +275,7 @@ class Board extends Component {
                 auxiliary: [],
                 active: null,
                 ongoing: true,
-                turn: this.state.turn === 'r' ? 'b' : 'r',
+                turn: this.state.turn === 'r' ? 'bl' : 'r',
                 history: [],
                 moves: 0
             });
@@ -315,9 +305,9 @@ class Board extends Component {
             rows[i] = this.renderRow(i);
         }
 
+        // initialize our dead piles
         var blDead = [];
         var rDead = [];
-        // initialize our dead pile(s)
         this.state.dead.map((e, i) => {
             if (e === 'r' || e === 'rk') {
                 rDead.push(
@@ -385,7 +375,9 @@ class Checkers extends Component {
     render() {
         return (
             <div id="checkers" className="container center">
-                <Board />
+                <Board
+                    roomId={this.props.roomId}
+                    toggleProgressBar={this.props.toggleProgressBar} />
             </div>
         );
     }

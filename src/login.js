@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import * as firebase from 'firebase';
-import LinearProgress from 'material-ui/LinearProgress';
 
 const INVALID_EMAIL = "Please enter a valid e-mail address.";
 const WRONG_PASSWORD = "Your password was incorrect.";
@@ -16,7 +15,6 @@ class Login extends Component {
             invalidEmail: false,
             invalidPassword: false,
             passwordStatus: '',
-            showProgress: false
         }
 
         this.handleInputEmailChange = this.handleInputEmailChange.bind(this);
@@ -66,30 +64,24 @@ class Login extends Component {
         }
     }
 
-    toggleIndeterminateProgressBar() {
-        this.setState({
-            showProgress: !this.state.showProgress
-        })
-    }
-
     handleLoginSubmit(event) {
-        this.toggleIndeterminateProgressBar(); // show progress bar to indicate loading status
+        this.props.toggleProgressBar(); // show progress bar to indicate loading status
         this.updateUI(0);
 
         firebase.auth().signInWithEmailAndPassword(this.state.inputEmail, this.state.inputPassword)
         .then(() => {
-            this.toggleIndeterminateProgressBar(); // done auth, hide progress bar
+            this.props.toggleProgressBar(); // done auth, hide progress bar
             this.props.onComplete(false);
         })
         .catch((error) => {
             switch (error.code) {
                 case 'auth/wrong-password':
                     this.updateUI(3);
-                    this.toggleIndeterminateProgressBar();
+                    this.props.toggleProgressBar();
                     break;
                 case 'auth/invalid-email':
                     this.updateUI(1);
-                    this.toggleIndeterminateProgressBar(); // hide progress bar, bad email
+                    this.props.toggleProgressBar(); // hide progress bar, bad email
                     break;
                 case 'auth/user-not-found':
                     this.createNewUserAndAuthenticate(this.state.inputEmail, this.state.inputPassword);
@@ -104,12 +96,12 @@ class Login extends Component {
             // Once account is created, log in
             firebase.auth().signInWithEmailAndPassword(email, password)
             .then(() => {
-                this.toggleIndeterminateProgressBar(); // done auth, hide progress bar
+                this.props.toggleProgressBar(); // done auth, hide progress bar
                 this.props.onComplete(true);
             });
         })
         .catch((error) => {
-            this.toggleIndeterminateProgressBar();
+            this.props.toggleProgressBar();
 
             switch (error.code) {
                 case 'auth/weak-password':
@@ -132,16 +124,11 @@ class Login extends Component {
     }
 
     render() {
-        var showProgress = (this.state.showProgress) ? "" : "hidden";
         var invalidEmail = (this.state.invalidEmail) ? "show" : "hidden";
         var invalidPassword = (this.state.invalidPassword) ? "show" : "hidden";
 
         return (
             <div id="login" className="container">
-                <div className={showProgress+" linear-progress"}>
-                    <LinearProgress mode="indeterminate" />
-                </div>
-
                 <form noValidate className="center">
                     <input
                         className={this.state.invalidEmail ? "invalid" : ""}
