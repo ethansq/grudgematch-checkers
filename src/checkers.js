@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 
 const BLACK_PIECE = require("./res/ch-bl-piece.png");
 const RED_PIECE = require("./res/ch-r-piece.png");
-// const CROWN = require("./res/crown.png");
+const BLACK_KING = require("./res/ch-bl-king-piece.png");
+const RED_KING = require("./res/ch-r-king-piece.png");
 
 function Cell(props) {
     var content;
@@ -11,7 +12,11 @@ function Cell(props) {
         content =
             <img
                 className="piece"
-                src={props.value === 'r' ? RED_PIECE : BLACK_PIECE}
+                src={
+                    props.value === 'r'
+                        ? (props.king ? RED_KING : RED_PIECE)
+                        : (props.king ? BLACK_KING : BLACK_PIECE)
+                }
                 alt="piece" />
     }
 
@@ -80,13 +85,12 @@ class Board extends Component {
             return;
         }
 
-        var content = this.state.cells[i] !== null ? this.state.cells[i].colour : null;
-
         return (
             <Cell
                 key={"cell-"+i}
                 highlight={this.state.auxiliary.indexOf(i) !== -1}
-                value={content}
+                value={this.state.cells[i] !== null ? this.state.cells[i].colour : null}
+                king={this.state.cells[i] !== null ?this.state.cells[i].king : null}
                 selected={this.state.selected === i}
                 onClick={() => this.handleCellClick(i)} />
         );
@@ -202,7 +206,7 @@ class Board extends Component {
 
         cells[_dest] = cells[_from]; // move piece
         cells[_from] = null; // delete piece from old position
-        cells[_dest].king = promote;
+        cells[_dest].king = promote ? true : cells[_dest].king;
 
 
         this.setState(
@@ -215,7 +219,7 @@ class Board extends Component {
                 // if it was a normal move, turn is over
                 ongoing: !normal
             },
-            () => { // once state is updated, also update the current selection
+            () => { // once state is updated, also update the current selected piece/cell
                 this.handleSelectCell(_dest);
             }
         );
