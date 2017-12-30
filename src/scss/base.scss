@@ -99,10 +99,16 @@ div.img-wrapper {
 }
 
 .bg.image-wrapper {
-    -webkit-filter: brightness(85%);
-    -ms-filter: brightness(85%);
-    -moz-filter: brightness(85%);
-    filter: brightness(85%);
+    height:140vh;
+
+    img {
+        height:100%;
+
+        -webkit-filter: brightness(85%);
+        -ms-filter: brightness(85%);
+        -moz-filter: brightness(85%);
+        filter: brightness(85%);
+    }
 }
 
 .slide-enter {
