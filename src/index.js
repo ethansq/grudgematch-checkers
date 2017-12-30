@@ -97,11 +97,12 @@ class Game extends Component {
         })
     }
 
-    toggleStatusMessage(message, show) {
+    toggleStatusMessage(message, show, type) {
     	if (show) {
     		this.setState({
     			statusMessage: message,
-    			showStatusMessage: true
+    			showStatusMessage: true,
+    			statusType: type
     		});
     	} else {
     		this.setState({showStatusMessage: false});
@@ -109,8 +110,10 @@ class Game extends Component {
     }
 
 	render() {
-        var showProgress = (this.state.showProgress) ? "" : "hidden";
-		var showStatusMessage = (this.state.showStatusMessage) ? "" : "hidden";
+        var showProgress = this.state.showProgress ? "" : "hidden";
+
+		var showStatusMessage = this.state.showStatusMessage ? "" : "hidden";
+        var statusClasses = ["status", showStatusMessage, this.state.statusType];
 		
 		return (
 			<ReactCSSTransitionGroup
@@ -130,7 +133,7 @@ class Game extends Component {
 			   		
 			   		{this.getComponent()}
 
-			   		<div className={showStatusMessage+" status"}>
+			   		<div className={statusClasses.join(' ')}>
 			   			<div className="shimmer">
 			   				{this.state.statusMessage}
 			   			</div>

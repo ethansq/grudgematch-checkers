@@ -143,6 +143,10 @@ div.img-wrapper {
         text-align:center;
     }
 
+    &.proceed {
+        background:$green;
+    }
+
     &.hidden {
         max-height:0px !important;
     }

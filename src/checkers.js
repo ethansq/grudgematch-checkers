@@ -75,13 +75,15 @@ class Board extends Component {
         // the listener will also trigger for the same user that
         // made the move, so prevent it by checking a timestamp
         ref.on('value', (snapshot) => {
-            if (this.state.timestamp !== snapshot.val().timestamp) {
-                this.setState(snapshot.val(), () => {
-                    this.props.toggleProgressBar(true); // force hide
-                    var message = "Waiting on opponent...";
-                    this.props.toggleStatusMessage(message, snapshot.val().turn !== this.props.role);
-                });
-            }
+            this.setState(snapshot.val(), () => {
+                this.props.toggleProgressBar(true); // force hide
+
+                var waiting = "Waiting on opponent...";
+                var proceed = "Your turn.";
+                var message = snapshot.val().turn !== this.props.role ? waiting : proceed;
+                var type = snapshot.val().turn !== this.props.role ? "waiting" : "proceed";
+                this.props.toggleStatusMessage(message, true, type);
+            });
         });
     }
 
@@ -211,7 +213,6 @@ class Board extends Component {
             piece = piece.concat(this.state.cells[_from + inner[outer.indexOf(_dest - _from)]].king ? 'k' : '');
             var _dead = this.state.dead.slice();
             _dead.push(piece);
-            console.log(piece);
             this.setState({dead: _dead});
 
             this.state.cells[_from + inner[outer.indexOf(_dest - _from)]] = -1;
@@ -303,7 +304,7 @@ class Board extends Component {
                 db.child('rooms').child(this.props.roomId).child('state').set(this.state)
                 .then(() => {
                     var message = "Waiting on opponent...";
-                    this.props.toggleStatusMessage(message, true);
+                    this.props.toggleStatusMessage(message, true, "waiting");
                 });
             });
         }
