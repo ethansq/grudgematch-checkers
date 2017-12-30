@@ -35,7 +35,42 @@ class Lobby extends Component {
             return;
         }
 
-        this.props.onComplete(inputRoomId, -1);
+        this.props.toggleProgressBar();
+        
+        var db = firebase.database().ref();
+        var ref = db.child('rooms').child(inputRoomId);
+        
+        ref.once('value', (snapshot) => {
+            if (snapshot.val() === null) {
+                this.updateUI(2);
+                this.props.toggleProgressBar();
+            } else {
+                var uid = firebase.auth().currentUser.uid;
+
+                if (snapshot.val().r === uid) {
+                    // if current user is 'r' in this room, let
+                    // him/her resume that role
+                    this.props.onComplete(inputRoomId, 'r');
+                    this.props.toggleProgressBar();
+                }  else if (snapshot.val().bl === undefined) {
+                    // if 'bl' is unoccupied, join the room as 'bl'
+                    ref.child('bl').set(uid)
+                    .then(() => {
+                        this.props.onComplete(inputRoomId, 'bl');
+                        this.props.toggleProgressBar();
+                    });
+                } else if (snapshot.val().bl === uid) {
+                    // if current user is 'bl' in this room, let
+                    // him/her resume that role
+                    this.props.onComplete(inputRoomId, 'bl');
+                    this.props.toggleProgressBar();
+                } else {
+                    // there's no room, update UI
+                    this.updateUI(3);
+                    this.props.toggleProgressBar();
+                }
+            }
+        });
     }
 
     generateBoard() {
@@ -103,13 +138,16 @@ class Lobby extends Component {
             case 0: // reset
                 this.setState({
                     invalidRoomId: false,
-                    invalidName: false,
                 });
                 break;
             case 1: // invalid room id
-                this.setState({
-                    invalidName: true
-                });
+                console.log("please enter a valid integer id");
+                break;
+            case 2: // room doesn't exist
+                console.log("room doesn't exist");
+                break;
+            case 3: // room is full
+                console.log("room is full");
                 break;
         }
     }
