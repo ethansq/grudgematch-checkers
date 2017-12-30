@@ -18,6 +18,8 @@
 
             @include vendor(border-top-left-radius, 3px);
             @include vendor(border-bottom-left-radius, 3px);
+            @include vendor(border-top-right-radius, 0px);
+            @include vendor(border-bottom-right-radius, 0px);
 
             &.invalid {
                 border-color:$red;
