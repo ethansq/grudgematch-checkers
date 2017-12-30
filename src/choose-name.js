@@ -6,7 +6,7 @@ class ChooseName extends Component {
         super(props);
 
         this.state = {
-            inputName: '',
+            inputName: 'Turtleneck',
             invalidName: false,
         }
 
@@ -65,7 +65,7 @@ class ChooseName extends Component {
                 <form noValidate className="center">
                     <input
                         className={this.state.invalidName ? "invalid" : ""}
-                        placeholder="CHOOSE A NAME"
+                        placeholder="Choose a name"
                         id="inputName"
                         type="text"
                         value={this.state.inputName}

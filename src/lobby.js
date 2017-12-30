@@ -169,7 +169,9 @@ class Lobby extends Component {
                     <div className="divider">OR</div> 
                     <div
                         onClick={this.handleCreateRoom}
-                        className="create-new-room">CREATE NEW ROOM</div>
+                        className="create-new-room">
+                            <div>CREATE NEW ROOM</div>
+                        </div>
                     <div className="message">You'll be given a room ID that another player can use to join you.</div>
                 </div>
             </div>

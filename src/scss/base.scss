@@ -17,6 +17,15 @@ body, html {
     font-family: 'Roboto', sans-serif;
 }
 
+body, html {
+    // prevent "tap highlighting" on mobile devices
+    // works for iPhone 8 Chrome
+    -webkit-tap-highlight-color:transparent;
+    -moz-tap-highlight-color:transparent;
+    -ms-tap-highlight-color:transparent;
+    tap-highlight-color:transparent;
+}
+
 // Prefer width = element width + padding + border
 *,
 *:after,
@@ -26,6 +35,8 @@ body, html {
 
 input[type='text'],
 input[type='number'],
+input[type='email'],
+input[type='password'],
 textarea {
   font-size: 16px;
 }

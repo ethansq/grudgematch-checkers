@@ -10,8 +10,8 @@ class Login extends Component {
         super(props);
 
         this.state = {
-            inputEmail: '',
-            inputPassword: '',
+            inputEmail: 'admin@admin.com',
+            inputPassword: 'password',
             invalidEmail: false,
             invalidPassword: false,
             passwordStatus: '',
@@ -133,7 +133,8 @@ class Login extends Component {
                     <input
                         className={this.state.invalidEmail ? "invalid" : ""}
                         placeholder="E-mail Address" id="inputEmail" type="email"
-                        value={this.state.inputEmail} onChange={this.handleInputEmailChange} />
+                        value={this.state.inputEmail}
+                        onChange={this.handleInputEmailChange} />
                     <div className={invalidEmail+" invalid-email"}>
                         Please enter a valid e-mail address.
                     </div>
@@ -141,7 +142,8 @@ class Login extends Component {
                     <input
                         className={this.state.invalidPassword ? "invalid" : ""}
                         placeholder="Password" id="inputPassword" type="password"
-                        value={this.state.inputPassword} onChange={this.handleInputPasswordChange} />
+                        value={this.state.inputPassword}
+                        onChange={this.handleInputPasswordChange} />
                     <div className={invalidPassword+" invalid-password"}>
                         {
                             this.state.passwordStatus === 'WRONG'
@@ -150,7 +152,9 @@ class Login extends Component {
                         }
                     </div>
 
-                    <div onClick={this.handleLoginSubmit} className="login-button">SIGN IN</div>
+                    <div onClick={this.handleLoginSubmit} className="login-button">
+                        <div>SIGN IN</div>
+                    </div>
                     
                     <div className="message">
                         Don't worry, we only use your e-mail for identification purposes.
