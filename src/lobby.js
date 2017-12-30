@@ -35,7 +35,7 @@ class Lobby extends Component {
             return;
         }
 
-        this.props.onComplete(inputRoomId);
+        this.props.onComplete(inputRoomId, -1);
     }
 
     generateBoard() {
@@ -94,7 +94,7 @@ class Lobby extends Component {
         db.child('rooms').child(roomId).set(roomData)
         .then(() => {
             this.props.toggleProgressBar();
-            this.props.onComplete(roomId+'');
+            this.props.onComplete(roomId+'', 'r'); // creator will always be red, by default
         });
     }
 

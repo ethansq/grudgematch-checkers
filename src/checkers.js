@@ -42,6 +42,8 @@ class Board extends Component {
     constructor(props) {
         super(props);
 
+        this.props.toggleProgressBar(); // force hide
+
         this.state = {
             turn: 'r',
             // @TEST
@@ -51,7 +53,8 @@ class Board extends Component {
             auxiliary: [], // options based on the selected piece
             active: null,
             ongoing: true,
-            history: []
+            history: [],
+            timestamp: -1 // timestamp of latest update
         };
 
         // bindings
@@ -62,18 +65,23 @@ class Board extends Component {
         this.handleSelectCell = this.handleSelectCell.bind(this);
         this.handleTurnEnd = this.handleTurnEnd.bind(this);
         this.handleUndo = this.handleUndo.bind(this);
-
-        this.props.toggleProgressBar();
     }
 
     componentWillMount() {
         // Fetch the board from Firebase
         var db = firebase.database().ref();
-        db.child('rooms').child(this.props.roomId).child('state').once('value', (snapshot) => {
-            this.setState(snapshot.val(), () => {
-                console.log(this.state);
-            });
-            this.props.toggleProgressBar();
+        var ref = db.child('rooms').child(this.props.roomId).child('state');
+
+        // the listener will also trigger for the same user that
+        // made the move, so prevent it by checking a timestamp
+        ref.on('value', (snapshot) => {
+            if (this.state.timestamp !== snapshot.val().timestamp) {
+                console.log("Hello");
+                this.setState(snapshot.val(), () => {
+                    this.props.toggleProgressBar(true); // force hide
+                    this.props.toggleStatusMessage('', false);
+                });
+            }
         });
     }
 
@@ -248,8 +256,11 @@ class Board extends Component {
             return;
         }
         // if we're clicking a friendly piece, "select" that piece
-        // using 'r' default for now
-        else if (this.state.cells[i] !== -1 && this.state.cells[i].colour === this.state.turn) {
+        // can only select friendly pieces (our current role)
+        else if (this.state.cells[i] !== -1
+            && this.state.cells[i].colour === this.state.turn
+            && this.state.cells[i].colour === this.props.role) {
+
             this.handleSelectCell(i);
         }
         // if we're clicking an empty space, de-select
@@ -272,7 +283,7 @@ class Board extends Component {
         if (this.state.active) {
             var db = firebase.database().ref();
 
-            this.props.toggleProgressBar();
+            // this.props.toggleProgressBar(); // show progress bar
 
             this.setState(
             {
@@ -282,14 +293,15 @@ class Board extends Component {
                 ongoing: true,
                 turn: this.state.turn === 'r' ? 'bl' : 'r',
                 history: [],
-                moves: 0
+                moves: 0,
+                timestamp: Date.now()
             },
             // update Firebase board state
             () => {
                 db.child('rooms').child(this.props.roomId).child('state').set(this.state)
                 .then(() => {
-                    console.log("State pushed");
-                    this.props.toggleProgressBar();
+                    var message = "Waiting on opponent...";
+                    this.props.toggleStatusMessage(message, true);
                 });
             });
         }
@@ -389,6 +401,8 @@ class Checkers extends Component {
         return (
             <div id="checkers" className="container center">
                 <Board
+                    toggleStatusMessage={this.props.toggleStatusMessage}
+                    role={this.props.role}
                     roomId={this.props.roomId}
                     toggleProgressBar={this.props.toggleProgressBar} />
             </div>

@@ -128,5 +128,72 @@ div.img-wrapper {
     }
 }
 
+.status {
+    position:absolute;
+    bottom:0px;
+    width:100%;
+    max-height:100px; // enough for our animation purposes
+    height:auto;
+    color:#fff;
+    background:$byzantine-blue;
+    transition:max-height 0.75s ease-in;
+
+    > div {
+        padding:16px 0px;
+        text-align:center;
+    }
+
+    &.hidden {
+        max-height:0px !important;
+    }
+}
+
+$gradientOptions: linear, left top, right top, from(#222), to(#222), color-stop(0.5, #fff);
+
+@mixin vendor($property, $value, $prefixes: ()) {
+    @each $prefix in $prefixes {
+        #{'-' + $prefix + '-' + $property}: $value;
+    }
+
+    // Output standard non-prefixed declaration
+    #{$property}: $value;
+}
+
+@mixin bg-vendor($property, $value, $prefixes: ()) {
+    @each $prefix in $prefixes {
+        #{'-' + $prefix + '-' + $property}: $value;
+    }
+
+    // Output standard non-prefixed declaration
+    #{$property}: $value;
+}
+
+.shimmer {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+
+    background: -webkit-gradient($gradientOptions);
+    background: -moz-gradient($gradientOptions);
+    background: gradient($gradientOptions);
+    @include vendor(background-size, 125px 100%, webkit ms moz);
+    @include vendor(background-clip, text, webkit ms moz);
+    @include vendor(animation-name, shimmer, webkit ms moz);
+    @include vendor(animation-duration, 1.5s, webkit ms moz);
+    @include vendor(animation-iteration-count, infinite, webkit ms moz);
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-color: #222;
+}
+
+@keyframes shimmer {
+    from {
+        background-position: top left
+    }
+
+    to {
+        background-position: top right
+    }
+}
+
 @import 'login', 'choose-name', 'lobby', 'checkers';
 @import 'font-awesome.min';

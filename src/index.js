@@ -25,13 +25,18 @@ class Game extends Component {
 
 		this.state = {
 			stage: 'login', // 'lobby', 'checkers'
-			showProgress: false
+			showProgress: false,
+			role: null,
+			roomId: null,
+			showStatusMessage: false,
+			statusMessage: ''
 		}
 
         this.handleLoginComplete = this.handleLoginComplete.bind(this);
         this.handleLobbyComplete = this.handleLobbyComplete.bind(this);
         this.handleChooseNameComplete = this.handleChooseNameComplete.bind(this);
         this.toggleIndeterminateProgressBar = this.toggleIndeterminateProgressBar.bind(this);
+        this.toggleStatusMessage = this.toggleStatusMessage.bind(this);
 	}
 
 	getComponent() {
@@ -56,7 +61,9 @@ class Game extends Component {
 		} else if (this.state.stage === 'checkers') {
 			return (
 				<Checkers
+					toggleStatusMessage={this.toggleStatusMessage}
 					roomId={this.state.roomId}
+					role={this.state.role}
 					toggleProgressBar={this.toggleIndeterminateProgressBar} />
 			);
 		}
@@ -75,22 +82,36 @@ class Game extends Component {
 		});
 	}
 
-	handleLobbyComplete(roomId) {
+	handleLobbyComplete(roomId, role) {
+		console.log("role="+role);
 		this.setState({
 			roomId: roomId,
+			role: role,
 			stage: 'checkers'
 		});
 	}
 
-    toggleIndeterminateProgressBar() {
+    toggleIndeterminateProgressBar(forceHide) {
         this.setState({
-            showProgress: !this.state.showProgress
+            showProgress: forceHide ? false : !this.state.showProgress
         })
+    }
+
+    toggleStatusMessage(message, show) {
+    	if (show) {
+    		this.setState({
+    			statusMessage: message,
+    			showStatusMessage: true
+    		});
+    	} else {
+    		this.setState({showStatusMessage: false});
+    	}
     }
 
 	render() {
         var showProgress = (this.state.showProgress) ? "" : "hidden";
-
+		var showStatusMessage = (this.state.showStatusMessage) ? "" : "hidden";
+		
 		return (
 			<ReactCSSTransitionGroup
 			    transitionName='slide'
@@ -98,16 +119,22 @@ class Game extends Component {
 			    transitionLeaveTimeout={400}
 			    component='div'>
 
-			    <div
-			    	className="slide-component-container"
-			   		key={this.state.stage}>
-            
+			    <div className="slide-component-container" key={this.state.stage}>
 	                <div className={showProgress+" linear-progress"}>
 	                    <LinearProgress mode="indeterminate" />
 	                </div>
 
-			   		<div className="image-wrapper"><img alt="bg" src={require("./res/background.jpg")} /></div>
+			   		<div className="image-wrapper">
+			   			<img alt="bg" src={require("./res/background.jpg")} />
+		   			</div>
+			   		
 			   		{this.getComponent()}
+
+			   		<div className={showStatusMessage+" status"}>
+			   			<div className="shimmer">
+			   				{this.state.statusMessage}
+			   			</div>
+				    </div>
 		   		</div>
 			</ReactCSSTransitionGroup>
 		);
