@@ -3,10 +3,11 @@ import * as firebase from 'firebase';
 
 var FontAwesome = require('react-fontawesome');
 
-const BLACK_PIECE = require("./res/ch-bl-piece.png");
-const RED_PIECE = require("./res/ch-r-piece.png");
-const BLACK_KING = require("./res/ch-bl-king-piece.png");
-const RED_KING = require("./res/ch-r-king-piece.png");
+const BLACK_PIECE = require("./res/ch-bl.png");
+const RED_PIECE = require("./res/ch-r.png");
+const BLACK_KING = require("./res/ch-bl-k.png");
+const RED_KING = require("./res/ch-r-k.png");
+
 
 function Cell(props) {
     var content;
@@ -78,7 +79,8 @@ class Board extends Component {
                 this.props.toggleProgressBar(true); // force hide
 
                 var waiting = "Waiting on opponent...";
-                var proceed = "Your turn.";
+                var proceed = "Your turn. You are ";
+                proceed = proceed.concat(this.props.role === 'r' ? "red." : "black.");
                 var message = snapshot.val().turn !== this.props.role ? waiting : proceed;
                 var type = snapshot.val().turn !== this.props.role ? "waiting" : "proceed";
                 this.props.toggleStatusMessage(message, true, type);
@@ -360,7 +362,7 @@ class Board extends Component {
         });
 
         return (
-            <div className="wrapper">
+            <div className="wrapper center">
                 <div className="w90">
                     <div className="board-section">
                         <div className="bl-dead">{blDead}</div>
@@ -398,20 +400,42 @@ class Checkers extends Component {
         super(props);
 
         this.state = {
+            showStatusMessage: false,
+            statusMessage: ''
+        }
+
+        this.toggleStatusMessage = this.toggleStatusMessage.bind(this);
+    }
+
+    toggleStatusMessage(message, show, type) {
+        if (show) {
+            this.setState({
+                statusMessage: message,
+                showStatusMessage: true,
+                statusType: type
+            });
+        } else {
+            this.setState({showStatusMessage: false});
         }
     }
 
     render() {
+        var showStatusMessage = this.state.showStatusMessage ? "" : "hidden";
+        var statusClasses = ["status", showStatusMessage, this.state.statusType];
+        
         return (
-            <div id="checkers" className="container center">
-                <div className="header">
-                    {"You are " + (this.props.role === 'r' ? "red." : "black.")}
-                </div>
+            <div id="checkers" className="container">
                 <Board
-                    toggleStatusMessage={this.props.toggleStatusMessage}
+                    toggleStatusMessage={this.toggleStatusMessage}
                     role={this.props.role}
                     roomId={this.props.roomId}
                     toggleProgressBar={this.props.toggleProgressBar} />
+
+                <div className={statusClasses.join(' ')}>
+                    <div className="shimmer">
+                        {this.state.statusMessage}
+                    </div>
+                </div>
             </div>
         );
     }

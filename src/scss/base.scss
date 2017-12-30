@@ -147,39 +147,54 @@ div.img-wrapper {
     transition: transform 400ms ease-in-out;
 }
 
+.slide-back-enter {
+    transform: translate(-100%);
+}
+
+.slide-back-enter.slide-back-enter-active {
+    transform: translate(0%);
+    transition: transform 400ms ease-in-out;
+}
+
+.slide-back-leave {
+    transform: translate(0%);
+}
+
+.slide-back-leave.slide-back-leave-active {
+    transform: translate(100%);
+    transition: transform 400ms ease-in-out;
+}
+
+
 .linear-progress {
     position:absolute;
     top:0px;
     left:0px;
     width:100%;
     height:4px;
+    z-index: 100;
 
     &.hidden {
         display:none;
     }
 }
 
-.status {
+.toolbar {
+    z-index:99;
     position:absolute;
-    bottom:0px;
+    top:0px;
+    left:0px;
     width:100%;
-    max-height:100px; // enough for our animation purposes
-    height:auto;
-    color:#fff;
-    background:$byzantine-blue;
-    transition:max-height 0.45s ease-in;
+    background:none;
+    height:72px;
+    padding-left:16px;
 
-    > div {
-        padding:16px 0px;
-        text-align:center;
-    }
-
-    &.proceed {
-        background:$green;
+    span.fa {
+        line-height:72px;
     }
 
     &.hidden {
-        max-height:0px !important;
+        display:none;
     }
 }
 
@@ -196,12 +211,12 @@ $gradientOptions: linear, left top, right top, from(#222), to(#222), color-stop(
 
 .shimmer {
     text-align: center;
-    color: rgba(255, 255, 255, 0.65);
+    color: rgba(255, 255, 255, 0.75);
 
     background: -webkit-gradient($gradientOptions);
     background: -moz-gradient($gradientOptions);
     background: gradient($gradientOptions);
-    @include vendor(background-size, 125px 100%);
+    @include vendor(background-size, 90px 100%);
     @include vendor(background-clip, text);
     @include vendor(animation-name, shimmer);
     @include vendor(animation-duration, 1.5s);

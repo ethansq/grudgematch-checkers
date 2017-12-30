@@ -1,6 +1,10 @@
 #checkers.container {
-	width:100%;
 	margin:0 auto;
+
+	.wrapper {
+		width:100%;
+		height:auto;
+	}
 
 	.header {
 		width:100%;
@@ -11,8 +15,8 @@
 
 	.content .wrapper {
 		font-size:0.8em;
-		width:80%;
-		height:80%;
+		width:86%;
+		height:86%;
 
 		img.piece {
 			vertical-align:top;
@@ -107,6 +111,32 @@
     		@include vendor(transform, rotate(180deg));
 		}
 	}
+
+	.status {
+	    position:absolute;
+	    bottom:0px;
+	    width:100%;
+	    max-height:100px; // enough for our animation purposes
+	    opacity:1;
+	    height:auto;
+	    color:#fff;
+	    background:$byzantine-blue;
+	    transition:max-height opacity 0.45s ease-in;
+
+	    > div {
+	        padding:16px 0px;
+	        text-align:center;
+	    }
+
+	    &.proceed {
+	        background:$green !important;
+	    }
+
+	    &.hidden {
+	        max-height:0px !important;
+	        opacity:0;
+	    }
+	}
 }
 
 /*
@@ -119,9 +149,6 @@ Board styles; spacing, sizes, backgrounds, etc
 	margin-right:8%;
 
 	.board-row {
-		&:first-child .cell { border-top:none; }
-		&:last-child .cell { border-bottom:none; }
-
 		&:nth-child(even) .cell:nth-child(odd),
 		&:nth-child(odd) .cell:nth-child(even) {
 			.background {
@@ -132,11 +159,8 @@ Board styles; spacing, sizes, backgrounds, etc
 		display:flex;
 
 		.cell {
-			&:first-child { border-left:none; }
-			&:last-child { border-right:none; }
-
 			width:12.5%;
-			border:0.5px solid rgba(255,255,255,0.2);
+			border:0px solid rgba(255,255,255,0.2);
 			display:inline-block;
 		  	position:relative;
 
@@ -160,14 +184,24 @@ Board styles; spacing, sizes, backgrounds, etc
 				opacity:0.32;
 			}
 
-			&.highlight .background {
-				background:$green !important;
-				opacity:0.55;
+			&.highlight {
+				border-color:$green !important;
+				border-width:1px !important;
+
+				.background {
+					background:$green !important;
+					opacity:0.55;
+				}
 			}
 
-			&.selected .background {
-				background:$byzantine-blue !important;
-				opacity:0.55;
+			&.selected {
+				border-color:$byzantine-blue !important;
+				border-width:1px !important;
+				
+				.background {
+					background:$byzantine-blue !important;
+					opacity:0.55;
+				}
 			}
 		}
 	}

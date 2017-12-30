@@ -10,6 +10,7 @@ import * as firebase from 'firebase';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import LinearProgress from 'material-ui/LinearProgress';
 
+var FontAwesome = require('react-fontawesome');
 var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
 
 // Firebase configurations
@@ -28,15 +29,14 @@ class Game extends Component {
 			showProgress: false,
 			role: null,
 			roomId: null,
-			showStatusMessage: false,
-			statusMessage: ''
+			slideDirection: 'slide'
 		}
 
         this.handleLoginComplete = this.handleLoginComplete.bind(this);
         this.handleLobbyComplete = this.handleLobbyComplete.bind(this);
         this.handleChooseNameComplete = this.handleChooseNameComplete.bind(this);
         this.toggleIndeterminateProgressBar = this.toggleIndeterminateProgressBar.bind(this);
-        this.toggleStatusMessage = this.toggleStatusMessage.bind(this);
+        this.handleBackPressed = this.handleBackPressed.bind(this);
 	}
 
 	getComponent() {
@@ -61,7 +61,6 @@ class Game extends Component {
 		} else if (this.state.stage === 'checkers') {
 			return (
 				<Checkers
-					toggleStatusMessage={this.toggleStatusMessage}
 					roomId={this.state.roomId}
 					role={this.state.role}
 					toggleProgressBar={this.toggleIndeterminateProgressBar} />
@@ -71,24 +70,56 @@ class Game extends Component {
 
 	handleChooseNameComplete() {
 		this.setState({
+			slideDirection: 'slide', // forwards
 			stage: 'lobby'
 		});
 	}
 
 	handleLoginComplete(createdNewUser) {
 		this.setState({
+			slideDirection: 'slide', // forwards
 			// stage: createdNewUser ? 'choose-name' : 'lobby'
 			stage: 'choose-name' // @TEST
 		});
 	}
 
 	handleLobbyComplete(roomId, role) {
-		console.log("role="+role);
 		this.setState({
+			slideDirection: 'slide', // forwards
 			roomId: roomId,
 			role: role,
 			stage: 'checkers'
 		});
+	}
+
+	handleBackPressed() {
+		switch (this.state.stage) {
+			case 'checkers':
+				this.setState({
+					slideDirection: "slide-back", // slide backwards
+					stage: 'lobby'
+				});
+				break;
+			case 'lobby':
+				this.setState({
+					slideDirection: "slide-back", // slide backwards
+					stage: 'choose-name'
+				});
+				break;
+			case 'choose-name':
+				// sign out first
+				this.toggleIndeterminateProgressBar();
+
+				firebase.auth().signOut()
+				.then(() => {
+					this.setState({
+						slideDirection: "slide-back", // slide backwards
+						stage: 'login'
+					});
+					this.toggleIndeterminateProgressBar();
+				});
+				break;
+		}
 	}
 
     toggleIndeterminateProgressBar(forceHide) {
@@ -97,32 +128,28 @@ class Game extends Component {
         })
     }
 
-    toggleStatusMessage(message, show, type) {
-    	if (show) {
-    		this.setState({
-    			statusMessage: message,
-    			showStatusMessage: true,
-    			statusType: type
-    		});
-    	} else {
-    		this.setState({showStatusMessage: false});
-    	}
-    }
-
 	render() {
         var showProgress = this.state.showProgress ? "" : "hidden";
+        var showToolbar = this.state.stage === 'choose-name' || this.state.stage === 'lobby'
+        	|| this.state.stage === 'checkers'
+        	? "show" : "hidden";
 
-		var showStatusMessage = this.state.showStatusMessage ? "" : "hidden";
-        var statusClasses = ["status", showStatusMessage, this.state.statusType];
-		
 		return (
 			<ReactCSSTransitionGroup
-			    transitionName='slide'
+			    transitionName={this.state.slideDirection}
 			    transitionEnterTimeout={400}
 			    transitionLeaveTimeout={400}
 			    component='div'>
 
 			    <div className="slide-component-container" key={this.state.stage}>
+	                <div className={showToolbar+" toolbar"}>
+                        <div><FontAwesome
+                        	onClick={this.handleBackPressed}
+                            name='long-arrow-left'
+                            size='2x'
+                            inverse /></div>
+	                </div>
+
 	                <div className={showProgress+" linear-progress"}>
 	                    <LinearProgress mode="indeterminate" />
 	                </div>
@@ -130,14 +157,8 @@ class Game extends Component {
 			   		<div className="bg image-wrapper">
 			   			<img alt="bg" src={require("./res/background.jpg")} />
 		   			</div>
-			   		
-			   		{this.getComponent()}
 
-			   		<div className={statusClasses.join(' ')}>
-			   			<div className="shimmer">
-			   				{this.state.statusMessage}
-			   			</div>
-				    </div>
+			   		{this.getComponent()}
 		   		</div>
 			</ReactCSSTransitionGroup>
 		);
