@@ -76,10 +76,10 @@ class Board extends Component {
         // made the move, so prevent it by checking a timestamp
         ref.on('value', (snapshot) => {
             if (this.state.timestamp !== snapshot.val().timestamp) {
-                console.log("Hello");
                 this.setState(snapshot.val(), () => {
                     this.props.toggleProgressBar(true); // force hide
-                    this.props.toggleStatusMessage('', false);
+                    var message = "Waiting on opponent...";
+                    this.props.toggleStatusMessage(message, snapshot.val().turn !== this.props.role);
                 });
             }
         });
@@ -195,7 +195,8 @@ class Board extends Component {
             cells: this.state.cells.slice(),
             ongoing: this.state.ongoing,
             selected: this.state.selected,
-            // turn: this.state.turn
+            dead: this.state.dead,
+            timestamp: this.state.timestamp
         });
 
         var _from = this.state.selected;
@@ -207,8 +208,11 @@ class Board extends Component {
         // if dest is an outer cell, remove the killed piece
         if (outer.indexOf(_dest - _from) !== -1) {
             var piece = this.state.cells[_from + inner[outer.indexOf(_dest - _from)]].colour;
-            piece = piece + this.state.cells[_from + inner[outer.indexOf(_dest - _from)]].king ? 'k' : '';
-            this.state.dead.push(piece);
+            piece = piece.concat(this.state.cells[_from + inner[outer.indexOf(_dest - _from)]].king ? 'k' : '');
+            var _dead = this.state.dead.slice();
+            _dead.push(piece);
+            console.log(piece);
+            this.setState({dead: _dead});
 
             this.state.cells[_from + inner[outer.indexOf(_dest - _from)]] = -1;
         }
@@ -283,8 +287,6 @@ class Board extends Component {
         if (this.state.active) {
             var db = firebase.database().ref();
 
-            // this.props.toggleProgressBar(); // show progress bar
-
             this.setState(
             {
                 selected: null,
@@ -318,7 +320,9 @@ class Board extends Component {
                 auxiliary: history.auxiliary,
                 cells: history.cells.slice(),
                 ongoing: history.ongoing,
-                selected: history.selected
+                selected: history.selected,
+                dead: history.dead,
+                timestamp: history.timestamp
             });
         }
     }
@@ -334,7 +338,7 @@ class Board extends Component {
         var blDead = [];
         var rDead = [];
         this.state.dead.map((e, i) => {
-            if (e === 'r' || e === 'rk') {
+            if (e.charAt(0) === 'r') {
                 rDead.push(
                     <div key={i} className="wrapper">
                         <img
