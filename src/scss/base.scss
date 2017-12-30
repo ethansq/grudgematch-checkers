@@ -98,6 +98,13 @@ div.img-wrapper {
     }
 }
 
+.bg.image-wrapper {
+    -webkit-filter: brightness(85%);
+    -ms-filter: brightness(85%);
+    -moz-filter: brightness(85%);
+    filter: brightness(85%);
+}
+
 .slide-enter {
     transform: translate(100%);
 }
@@ -174,7 +181,7 @@ $gradientOptions: linear, left top, right top, from(#222), to(#222), color-stop(
 
 .shimmer {
     text-align: center;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.65);
 
     background: -webkit-gradient($gradientOptions);
     background: -moz-gradient($gradientOptions);

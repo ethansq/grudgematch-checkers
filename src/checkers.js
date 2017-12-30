@@ -405,6 +405,9 @@ class Checkers extends Component {
     render() {
         return (
             <div id="checkers" className="container center">
+                <div className="header">
+                    {"You are " + (this.props.role === 'r' ? "red." : "black.")}
+                </div>
                 <Board
                     toggleStatusMessage={this.props.toggleStatusMessage}
                     role={this.props.role}

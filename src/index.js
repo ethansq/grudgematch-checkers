@@ -127,7 +127,7 @@ class Game extends Component {
 	                    <LinearProgress mode="indeterminate" />
 	                </div>
 
-			   		<div className="image-wrapper">
+			   		<div className="bg image-wrapper">
 			   			<img alt="bg" src={require("./res/background.jpg")} />
 		   			</div>
 			   		
