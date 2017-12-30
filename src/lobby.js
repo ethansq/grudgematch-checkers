@@ -6,7 +6,7 @@ class Lobby extends Component {
         super(props);
 
         this.state = {
-            inputRoomId: '4930',
+            inputRoomId: '',
             invalidRoomId: false,
         }
 
@@ -76,10 +76,8 @@ class Lobby extends Component {
     generateBoard() {
         // default board with starting positions
         var cells = Array(64).fill(-1);
-        // var b = [8, 1, 17, 10, 3, 19, 12, 5, 21, 14, 7, 23];
-        // var r = [40, 56, 49, 42, 58, 51, 44, 60, 53, 46, 62, 55];
-        var bl = [26, 28, 12, 14]; // @TEST
-        var r = [35, 37]; // @TEST
+        var bl = [8, 1, 17, 10, 3, 19, 12, 5, 21, 14, 7, 23];
+        var r = [40, 56, 49, 42, 58, 51, 44, 60, 53, 46, 62, 55];
 
         for (var i=0; i<64; i++) {
             if (bl.indexOf(i) !== -1) {
@@ -99,8 +97,7 @@ class Lobby extends Component {
 
         return ({
             turn: 'r', // by default, 'r' goes first
-            // @TEST
-            dead: ['r', 'r', 'blk', 'blk', 'bl', 'rk'], // helper array to keep track of how many to show in the dead pile
+            dead: [], // helper array to keep track of how many to show in the dead pile
             cells: cells,
             selected: null, // index of selected piece
             auxiliary: [], // options based on the selected piece

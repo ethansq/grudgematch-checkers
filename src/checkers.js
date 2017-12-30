@@ -46,7 +46,6 @@ class Board extends Component {
 
         this.state = {
             turn: 'r',
-            // @TEST
             dead: [], // helper array to keep track of how many to show in the dead pile
             cells: [],
             selected: null, // index of selected piece
