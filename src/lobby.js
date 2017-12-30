@@ -63,7 +63,7 @@ class Lobby extends Component {
         }
 
         return ({
-            turn: 'r',
+            turn: 'r', // by default, 'r' goes first
             // @TEST
             dead: ['r', 'r', 'blk', 'blk', 'bl', 'rk'], // helper array to keep track of how many to show in the dead pile
             cells: cells,

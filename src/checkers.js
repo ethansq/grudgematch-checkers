@@ -270,7 +270,12 @@ class Board extends Component {
         // Can only end turn if a piece has made a move (cannot pass)
         // Also
         if (this.state.active) {
-            this.setState({
+            var db = firebase.database().ref();
+
+            this.props.toggleProgressBar();
+
+            this.setState(
+            {
                 selected: null,
                 auxiliary: [],
                 active: null,
@@ -278,6 +283,14 @@ class Board extends Component {
                 turn: this.state.turn === 'r' ? 'bl' : 'r',
                 history: [],
                 moves: 0
+            },
+            // update Firebase board state
+            () => {
+                db.child('rooms').child(this.props.roomId).child('state').set(this.state)
+                .then(() => {
+                    console.log("State pushed");
+                    this.props.toggleProgressBar();
+                });
             });
         }
     }
