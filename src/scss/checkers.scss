@@ -66,9 +66,8 @@
 			display:inline-block;
 			position:relative;
 
-            border-radius:3px;
-            -webkit-border-radius:3px;
-            -moz-border-radius:3px;
+            @include vendor(border-radius, 3px);
+            
         	box-shadow:0px 2px 8px -4px;
 
         	&:active:not(.disabled) {
@@ -137,11 +136,7 @@
 			position:absolute;
 			right:0px;
 
-			-webkit-transform: rotate(180deg);     /* Chrome and other webkit browsers */
-			-moz-transform: rotate(180deg);        /* FF */
-			-o-transform: rotate(180deg);          /* Opera */
-			-ms-transform: rotate(180deg);         /* IE9 */
-			transform: rotate(180deg);    
+    		@include vendor(transform, rotate(180deg));
 		}
 	}
 }

@@ -6,6 +6,14 @@ $green: #34A853;
 
 @import url('https://fonts.googleapis.com/css?family=Roboto');
 
+@mixin vendor($property, $value) {
+    #{'-moz-'+$property}: $value;
+    #{'-ms-'+$property}: $value;
+    #{'-webkit-'+$property}: $value;
+    #{'-o-'+$property}: $value;
+    #{$property}: $value;
+}
+
 body, html {
     overflow-y: hidden;
 	overflow-x: hidden;
@@ -20,10 +28,7 @@ body, html {
 body, html {
     // prevent "tap highlighting" on mobile devices
     // works for iPhone 8 Chrome
-    -webkit-tap-highlight-color:transparent;
-    -moz-tap-highlight-color:transparent;
-    -ms-tap-highlight-color:transparent;
-    tap-highlight-color:transparent;
+    @include vendor(tap-highlight-color, transparent);
 }
 
 // Prefer width = element width + padding + border
@@ -99,9 +104,7 @@ and <img> tags
     position: absolute;
     left: 50%;
     top: 50%;
-    -webkit-transform: translate(-50%, -50%);
-    -moz-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
+    @include vendor(transform, translate(-50%, -50%));
 }
 
 div.img-wrapper {
@@ -120,11 +123,7 @@ div.img-wrapper {
 
     img {
         height:100%;
-
-        -webkit-filter: brightness(85%);
-        -ms-filter: brightness(85%);
-        -moz-filter: brightness(85%);
-        filter: brightness(85%);
+        @include vendor(filter, brightness(85%));
     }
 }
 
@@ -184,15 +183,6 @@ div.img-wrapper {
 
 $gradientOptions: linear, left top, right top, from(#222), to(#222), color-stop(0.5, #fff);
 
-@mixin vendor($property, $value, $prefixes: ()) {
-    @each $prefix in $prefixes {
-        #{'-' + $prefix + '-' + $property}: $value;
-    }
-
-    // Output standard non-prefixed declaration
-    #{$property}: $value;
-}
-
 @mixin bg-vendor($property, $value, $prefixes: ()) {
     @each $prefix in $prefixes {
         #{'-' + $prefix + '-' + $property}: $value;
@@ -209,11 +199,11 @@ $gradientOptions: linear, left top, right top, from(#222), to(#222), color-stop(
     background: -webkit-gradient($gradientOptions);
     background: -moz-gradient($gradientOptions);
     background: gradient($gradientOptions);
-    @include vendor(background-size, 125px 100%, webkit ms moz);
-    @include vendor(background-clip, text, webkit ms moz);
-    @include vendor(animation-name, shimmer, webkit ms moz);
-    @include vendor(animation-duration, 1.5s, webkit ms moz);
-    @include vendor(animation-iteration-count, infinite, webkit ms moz);
+    @include vendor(background-size, 125px 100%);
+    @include vendor(background-clip, text);
+    @include vendor(animation-name, shimmer);
+    @include vendor(animation-duration, 1.5s);
+    @include vendor(animation-iteration-count, infinite);
     background-repeat: no-repeat;
     background-position: 0 0;
     background-color: #222;

@@ -8,9 +8,8 @@
 			border:#fff 2px solid;
 			padding:8px;
 
-			border-radius:3px;
-			-webkit-border-radius:3px;
-			-moz-border-radius:3px;
+            @include vendor(border-radius, 3px);
+
 			box-shadow:0px 2px 8px -4px;
 
 			&.invalid {
@@ -42,9 +41,8 @@
 			text-align:center;
 			background:$green;
 
-			border-radius:3px;
-			-webkit-border-radius:3px;
-			-moz-border-radius:3px;
+            @include vendor(border-radius, 3px);
+			
 			box-shadow:0px 2px 8px -4px;
 
 			> div {
