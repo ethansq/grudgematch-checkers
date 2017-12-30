@@ -24,7 +24,7 @@ class Game extends Component {
 		super(props);
 
 		this.state = {
-			stage: 'login', // 'lobby', 'checkers'
+			stage: 'login',
 			showProgress: false,
 			role: null,
 			roomId: null,
