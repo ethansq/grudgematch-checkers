@@ -97,7 +97,7 @@ class Lobby extends Component {
 
         return ({
             turn: 'r', // by default, 'r' goes first
-            dead: ['bl', 'bl', 'bl', 'r', 'r', 'rk', 'blk'], // helper array to keep track of how many to show in the dead pile
+            dead: [], // helper array to keep track of how many to show in the dead pile
             cells: cells,
             selected: null, // index of selected piece
             auxiliary: [], // options based on the selected piece
