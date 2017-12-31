@@ -79,6 +79,8 @@
 		position:relative;
 
 		.r-dead, .bl-dead {
+			position:absolute;
+			top:50%;
 			width:6%;
 			display:inline-block;
 
@@ -104,11 +106,15 @@
 			}
 		}
 
+		.bl-dead {
+			left:0px;
+			@include vendor(transform, translate(0, -50%));
+		}
+
 		.r-dead {
-			position:absolute;
 			right:0px;
 
-    		@include vendor(transform, rotate(180deg));
+    		@include vendor(transform, translate(0, -50%) rotate(180deg));
 		}
 	}
 
@@ -146,7 +152,7 @@ Board styles; spacing, sizes, backgrounds, etc
 	width:84%;
 	display:inline-block;
 	margin-left:2%;
-	margin-right:8%;
+	margin-right:2%;
 
 	.board-row {
 		&:nth-child(even) .cell:nth-child(odd),

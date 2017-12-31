@@ -8,7 +8,6 @@ const RED_PIECE = require("./res/ch-r.png");
 const BLACK_KING = require("./res/ch-bl-k.png");
 const RED_KING = require("./res/ch-r-k.png");
 
-
 function Cell(props) {
     var content;
 
