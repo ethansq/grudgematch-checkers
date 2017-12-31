@@ -141,42 +141,36 @@ class Board extends Component {
             }
             // turn is still ongoing, but a piece is 'active'
             else if (this.state.active !== null) {
-                // must be within bounds
-                if (ele < 0 || ele > 63) {
-                    return -1;
-                }
-                // while active, inner moves are not allowed
-                else if (index % 2 === 0) {
+                if (false
+                    || ele < 0 || ele > 63 // must be within bounds
+                    || index % 2 === 0 // while active, inner moves (non-kills) are not allowed
+                    || this.state.cells[ele] !== -1 // dest needs to be empty
+                    || this.state.cells[auxiliary[index-1]] === -1 // if no piece to kill in between, cannot move to outer cell
+                    || this.state.cells[auxiliary[index-1]].colour === colour // cannot kill friendlies
+                    || (colour === 'r' && ele > i && !this.state.cells[i].king) // only kings can move backwards
+                    || (colour === 'bl' && ele < i && !this.state.cells[i].king)
+                    || (index % 2 === 1 && this.rowsApart(i, ele) !== 2) // must maintain diagonal move structure
+                ) {
                     return -1;
                 } else {
-                    if (this.state.cells[auxiliary[index-1]] === -1 || // if no piece to kill, cannot move to this dest
-                            this.state.cells[auxiliary[index-1]].colour === colour) { // cannot kill friendlies
-                        return -1;
-                    }
-                    // unless this piece is a king, can only kill forwards
-                    else if (((colour === 'r' && ele > i) && !this.state.cells[i].king)
-                        || ((colour === 'bl' && ele < i) && !this.state.cells[i].king)) {
-                        return -1;
-                    }
                     return ele;
                 }
             } else if (false
                 // our rules chart for determining whether a cell is a valid destination
                 // or not
-                || (ele < 0 || ele > 63) // space needs to be on the board
-                || (this.state.cells[ele] !== -1) // space needs to be empty
+                || ele < 0 || ele > 63 // space needs to be on the board
+                || this.state.cells[ele] !== -1 // space needs to be empty
                 || (index % 2 !== 0 &&
                         (this.state.cells[auxiliary[index-1]] === -1 || // outer cells need a piece to jump over
-                            this.state.cells[auxiliary[index-1]].colour === colour) // and we can't eat friendlies
-                        )
-                || (index % 2 === 1 && this.rowsApart(i, ele) !== 2)
+                            this.state.cells[auxiliary[index-1]].colour === colour)) // and we can't eat friendlies
+                || (index % 2 === 1 && this.rowsApart(i, ele) !== 2) // must maintain diagonal move structure
                 || (index % 2 === 0 && this.rowsApart(i, ele) !== 1)
-                || ((colour === 'r' && ele > i) && !this.state.cells[i].king) // non-kings cannot move backwards
-                || ((colour === 'bl' && ele < i) && !this.state.cells[i].king)
+                || (colour === 'r' && ele > i && !this.state.cells[i].king) // non-kings cannot move backwards
+                || (colour === 'bl' && ele < i && !this.state.cells[i].king)
             ) {
                 return -1;
             }
-            return ele;
+            return ele; // default
         });
 
         this.setState({
