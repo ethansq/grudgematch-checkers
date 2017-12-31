@@ -42,20 +42,12 @@
 			background:$green;
 
             @include vendor(border-radius, 3px);
-			
+
 			box-shadow:0px 2px 8px -4px;
 
 			> div {
 				color:#fff; // to prevent box-shadow from inheriting
 			}
-		}
-
-		.message {
-			color:#fff;
-			margin-top:16px;
-			text-align:center;
-			font-size:0.8em;
-			padding:0px 24px;
 		}
 	}
 }

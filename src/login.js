@@ -157,7 +157,7 @@ class Login extends Component {
                     </div>
                     
                     <div className="message">
-                        Don't worry, we only use your e-mail for identification purposes.
+                        You can use any e-mail, as long as you remember the password for it. We won't ever send you anything.
                     </div>
                 </form>
             </div>

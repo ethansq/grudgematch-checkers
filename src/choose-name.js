@@ -62,18 +62,22 @@ class ChooseName extends Component {
     render() {
         return (
             <div id="chooseName" className="container">
-                <form noValidate className="center">
-                    <input
-                        className={this.state.invalidName ? "invalid" : ""}
-                        placeholder="Choose a name"
-                        id="inputName"
-                        type="text"
-                        value={this.state.inputName}
-                        onChange={this.handleInputName} />
-                    <div onClick={this.handleSubmit} className="done-button">
-                        <div className="arrow"></div>
-                    </div>
-                </form>
+                <div className="wrapper center">
+                    <form noValidate>
+                        <input
+                            className={this.state.invalidName ? "invalid" : ""}
+                            placeholder="Choose a name"
+                            id="inputName"
+                            type="text"
+                            value={this.state.inputName}
+                            onChange={this.handleInputName} />
+                        <div onClick={this.handleSubmit} className="done-button">
+                            <div className="arrow"></div>
+                        </div>
+                    </form>
+
+                    <div className="message">Choose a name that you will be visible as.</div>
+                </div>
             </div>
         );
     }

@@ -1,16 +1,24 @@
 #chooseName.container {
+    .wrapper {
+        width:100%;
+    }
+    
     form {
+        margin:0 auto;
+        display:flex;
         width:90%;
+        box-shadow:0px 2px 8px -4px;
 
         input {
-            width:100%;
+            width:80%;
             height:48px;
             border:#fff 2px solid;
             padding:8px;
 
-            @include vendor(border-radius, 3px);
-
-            box-shadow:0px 2px 8px -4px;
+            @include vendor(border-top-left-radius, 3px);
+            @include vendor(border-bottom-left-radius, 3px);
+            @include vendor(border-top-right-radius, 0px);
+            @include vendor(border-bottom-right-radius, 0px);
 
             &.invalid {
                 border-color:$red;
@@ -18,13 +26,12 @@
         }
 
         .done-button {
-            margin:0 auto;
-            margin-top:24px;
-            width:92px;
-            height:36px;
+            width:20%;
+            height:48px;
             background:$green;
 
-            @include vendor(border-radius, 18px);
+            @include vendor(border-top-right-radius, 3px);
+            @include vendor(border-bottom-right-radius, 3px);
 
             .arrow {
                 width:100%;

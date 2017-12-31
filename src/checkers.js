@@ -44,6 +44,10 @@ class Board extends Component {
 
         this.props.toggleProgressBar(); // force hide
 
+        var title = "Room ";
+        title = title.concat(this.props.roomId);
+        this.props.setToolbarTitle(title);
+
         this.state = {
             turn: 'r',
             dead: [], // helper array to keep track of how many to show in the dead pile
@@ -433,6 +437,7 @@ class Checkers extends Component {
         return (
             <div id="checkers" className="container">
                 <Board
+                    setToolbarTitle={this.props.setToolbarTitle}
                     toggleStatusMessage={this.toggleStatusMessage}
                     role={this.props.role}
                     roomId={this.props.roomId}

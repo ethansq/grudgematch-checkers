@@ -165,7 +165,6 @@ div.img-wrapper {
     transition: transform 400ms ease-in-out;
 }
 
-
 .linear-progress {
     position:absolute;
     top:0px;
@@ -193,9 +192,26 @@ div.img-wrapper {
         line-height:72px;
     }
 
+    div.title {
+        display:inline-block;
+        vertical-align:top;
+        margin-left:24px;
+        line-height:72px;
+        color:#fff;
+        font-size:20px;
+    }
+
     &.hidden {
         display:none;
     }
+}
+
+.message {
+    color:#fff;
+    margin-top:18px;
+    text-align:center;
+    font-size:0.8em;
+    padding:0px 24px;
 }
 
 $gradientOptions: linear, left top, right top, from(#222), to(#222), color-stop(0.5, #fff);

@@ -29,7 +29,8 @@ class Game extends Component {
 			showProgress: false,
 			role: null,
 			roomId: null,
-			slideDirection: 'slide'
+			slideDirection: 'slide',
+			toolbarTitle: ''
 		}
 
         this.handleLoginComplete = this.handleLoginComplete.bind(this);
@@ -37,6 +38,7 @@ class Game extends Component {
         this.handleChooseNameComplete = this.handleChooseNameComplete.bind(this);
         this.toggleIndeterminateProgressBar = this.toggleIndeterminateProgressBar.bind(this);
         this.handleBackPressed = this.handleBackPressed.bind(this);
+        this.setToolbarTitle = this.setToolbarTitle.bind(this);
 	}
 
 	getComponent() {
@@ -61,6 +63,7 @@ class Game extends Component {
 		} else if (this.state.stage === 'checkers') {
 			return (
 				<Checkers
+					setToolbarTitle={this.setToolbarTitle}
 					roomId={this.state.roomId}
 					role={this.state.role}
 					toggleProgressBar={this.toggleIndeterminateProgressBar} />
@@ -122,6 +125,12 @@ class Game extends Component {
 		}
 	}
 
+	setToolbarTitle(title) {
+		this.setState({
+			toolbarTitle: title
+		});
+	}
+
     toggleIndeterminateProgressBar(forceHide) {
         this.setState({
             showProgress: forceHide ? false : !this.state.showProgress
@@ -143,11 +152,14 @@ class Game extends Component {
 
 			    <div className="slide-component-container" key={this.state.stage}>
 	                <div className={showToolbar+" toolbar"}>
-                        <div><FontAwesome
-                        	onClick={this.handleBackPressed}
-                            name='long-arrow-left'
-                            size='2x'
-                            inverse /></div>
+                        <div>
+	                        <FontAwesome
+	                        	onClick={this.handleBackPressed}
+	                            name='long-arrow-left'
+	                            size='2x'
+	                            inverse />
+	                        <div className="title">{this.state.toolbarTitle}</div>
+                        </div>
 	                </div>
 
 	                <div className={showProgress+" linear-progress"}>
