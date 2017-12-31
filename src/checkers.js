@@ -185,10 +185,24 @@ class Board extends Component {
     */
     handleMove(i) {
         var _history = this.state.history.slice();
+
+        // deep-copy our cells array
+        var _cells = this.state.cells.map((ele, i) => {
+            if (ele === -1) {
+                return ele;
+            } else {
+                return ({
+                    colour: ele.colour,
+                    king: ele.king
+                });
+            }
+        });
+
+        // store our move in local history (this doesn't get pushed up to Firebase) 
         _history.push({
             active: this.state.active,
             auxiliary: this.state.auxiliary,
-            cells: this.state.cells.slice(),
+            cells: _cells,
             ongoing: this.state.ongoing,
             selected: this.state.selected,
             dead: this.state.dead,
