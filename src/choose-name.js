@@ -6,7 +6,7 @@ class ChooseName extends Component {
         super(props);
 
         this.state = {
-            inputName: 'Turtleneck', // @TEST
+            inputName: '', // @TEST
             invalidName: false,
         }
 

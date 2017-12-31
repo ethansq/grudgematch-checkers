@@ -10,8 +10,8 @@ class Login extends Component {
         super(props);
 
         this.state = {
-            inputEmail: 'admin@admin.com', // @TEST
-            inputPassword: 'password', // @TEST
+            inputEmail: '', // @TEST
+            inputPassword: '', // @TEST
             invalidEmail: false,
             invalidPassword: false,
             passwordStatus: '',

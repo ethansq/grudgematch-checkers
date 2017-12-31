@@ -63,6 +63,7 @@ class Game extends Component {
 		} else if (this.state.stage === 'checkers') {
 			return (
 				<Checkers
+					handleBackPressed={this.handleBackPressed}
 					setToolbarTitle={this.setToolbarTitle}
 					roomId={this.state.roomId}
 					role={this.state.role}
@@ -81,8 +82,7 @@ class Game extends Component {
 	handleLoginComplete(createdNewUser) {
 		this.setState({
 			slideDirection: 'slide', // forwards
-			// stage: createdNewUser ? 'choose-name' : 'lobby'
-			stage: 'choose-name' // @TEST
+			stage: createdNewUser ? 'choose-name' : 'lobby'
 		});
 	}
 

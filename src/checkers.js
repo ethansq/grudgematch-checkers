@@ -519,7 +519,7 @@ class Checkers extends Component {
 
         return (
             <div id="checkers" className="container">
-                <div className={modalVisibility+" modal"}>
+                <div onClick={this.props.handleBackPressed} className={modalVisibility+" modal"}>
                     <div className="background"></div>
                     <div className="img center">
                         <img
@@ -533,7 +533,7 @@ class Checkers extends Component {
                             alt="modal" />
                     </div>
                 </div>
-                
+
                 <Board
                     showGameOverModal={this.showGameOverModal}
                     setToolbarTitle={this.props.setToolbarTitle}
