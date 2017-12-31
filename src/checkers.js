@@ -90,7 +90,6 @@ class Board extends Component {
 
                 if (this.state.gameOver !== '') {
                     this.props.showGameOverModal(this.state.gameOver === this.props.role);
-                    console.log(this.state.gameOver === this.props.role);
                 } else {
                     var waiting = "Waiting on opponent...";
                     var proceed = "Your turn. You are ";
@@ -146,7 +145,7 @@ class Board extends Component {
     /*
     i: the index of the cell we're currently considering
     */
-    buildAuxiliaryCells(i) {
+    buildAuxiliaryCells(i, isCheck) {
         var colour = this.state.cells[i].colour;
         var auxiliary = [i-9, i-18, i-7, i-14, i+7, i+14, i+9, i+18];
 
@@ -154,11 +153,11 @@ class Board extends Component {
         // space is already occupied, etc)
         var _auxiliary = auxiliary.map((ele, index) => {
             // turn is over
-            if (!this.state.ongoing) {
+            if (!this.state.ongoing && !isCheck) {
                 return -1;
             }
             // turn is still ongoing, but a piece is 'active'
-            else if (this.state.active !== null) {
+            else if (this.state.active !== null && !isCheck) {
                 if (false
                     || ele < 0 || ele > 63 // must be within bounds
                     || index % 2 === 0 // while active, inner moves (non-kills) are not allowed
@@ -195,7 +194,7 @@ class Board extends Component {
     }
 
     handleSelectCell(i) {
-        var _auxiliary = this.buildAuxiliaryCells(i);
+        var _auxiliary = this.buildAuxiliaryCells(i, false);
 
         this.setState({
             selected: i,
@@ -386,7 +385,9 @@ class Board extends Component {
         }
 
         var n = opponents.length;
-        if (n === 0) return this.props.role; // no opponent pieces left
+        if (n === 0) {
+            return this.props.role; // no opponent pieces left
+        }
 
         /*
         checking if the opponent has no possible moves to make is a little more
@@ -399,7 +400,7 @@ class Board extends Component {
         var _auxiliary;
         for (var i=0; i<n; i++) {
             index = opponents[i];
-            _auxiliary = this.buildAuxiliaryCells(index);
+            _auxiliary = this.buildAuxiliaryCells(index, true);
 
             for (var j=0; j<8; j++) {
                 if (_auxiliary[j] !== -1) {
@@ -504,8 +505,6 @@ class Checkers extends Component {
     }
 
     showGameOverModal(status) {
-        console.log("status");
-        console.log(status);
         this.setState({
             gameOverModal: status ? "victory" : "defeat"
         });

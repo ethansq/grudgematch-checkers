@@ -103,7 +103,8 @@ class Lobby extends Component {
             auxiliary: [], // options based on the selected piece
             active: null,
             ongoing: true,
-            history: []
+            history: [],
+            gameOver: ''
         });
     }
 
