@@ -76,8 +76,13 @@ class Lobby extends Component {
     generateBoard() {
         // default board with starting positions
         var cells = Array(64).fill(-1);
-        var bl = [8, 1, 17, 10, 3, 19, 12, 5, 21, 14, 7, 23];
-        var r = [40, 56, 49, 42, 58, 51, 44, 60, 53, 46, 62, 55];
+        // var bl = [8, 1, 17, 10, 3, 19, 12, 5, 21, 14, 7, 23];
+        // var r = [40, 56, 49, 42, 58, 51, 44, 60, 53, 46, 62, 55];
+        // @TEST
+        // var bl = [8, 1, 17, 10, 3, 19, 12, 5, 21, 14, 7, 23, 24, 26, 28, 30, 33, 35, 37, 39, 40, 42, 44, 46];
+        // var r = [56];
+        var bl = [38];
+        var r = [45];
 
         for (var i=0; i<64; i++) {
             if (bl.indexOf(i) !== -1) {
@@ -97,7 +102,7 @@ class Lobby extends Component {
 
         return ({
             turn: 'r', // by default, 'r' goes first
-            dead: [], // helper array to keep track of how many to show in the dead pile
+            dead: ['bl', 'bl', 'bl', 'r', 'r', 'rk', 'blk'], // helper array to keep track of how many to show in the dead pile
             cells: cells,
             selected: null, // index of selected piece
             auxiliary: [], // options based on the selected piece
@@ -171,7 +176,8 @@ class Lobby extends Component {
                         onClick={this.handleCreateRoom}
                         className="create-new-room">
                             <div>CREATE NEW ROOM</div>
-                        </div>
+                    </div>
+                    
                     <div className="message">You'll be given a room ID that another player can use to join you.</div>
                 </div>
             </div>

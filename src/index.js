@@ -99,12 +99,14 @@ class Game extends Component {
 		switch (this.state.stage) {
 			case 'checkers':
 				this.setState({
+					toolbarTitle: '',
 					slideDirection: "slide-back", // slide backwards
 					stage: 'lobby'
 				});
 				break;
 			case 'lobby':
 				this.setState({
+					toolbarTitle: '',
 					slideDirection: "slide-back", // slide backwards
 					stage: 'choose-name'
 				});
@@ -116,6 +118,7 @@ class Game extends Component {
 				firebase.auth().signOut()
 				.then(() => {
 					this.setState({
+						toolbarTitle: '',
 						slideDirection: "slide-back", // slide backwards
 						stage: 'login'
 					});

@@ -127,7 +127,8 @@
 	    height:auto;
 	    color:#fff;
 	    background:$byzantine-blue;
-	    transition:max-height opacity 0.45s ease-in;
+
+	    // transition:max-height opacity 0.45s ease-in;
 
 	    > div {
 	        padding:16px 0px;
@@ -192,7 +193,7 @@ Board styles; spacing, sizes, backgrounds, etc
 
 			&.highlight {
 				border-color:$green !important;
-				border-width:1px !important;
+				// border-width:1px !important;
 
 				.background {
 					background:$green !important;
@@ -202,13 +203,59 @@ Board styles; spacing, sizes, backgrounds, etc
 
 			&.selected {
 				border-color:$byzantine-blue !important;
-				border-width:1px !important;
+				// border-width:1px !important;
 				
 				.background {
 					background:$byzantine-blue !important;
 					opacity:0.55;
 				}
 			}
+		}
+	}
+}
+
+#checkers .modal {
+	position:absolute;
+	top:0px;
+	left:0px;
+	width:100%;
+	height:100%;
+	z-index:102;
+
+	.background {
+		width:100%;
+		height:100%;
+		background:#000;
+		opacity:0.5;
+		transition:opacity 0.75s ease-in;
+	}
+
+	.img {
+		margin:0 auto;
+		text-align:center;
+		width:100%;
+		height:100%;
+		
+		img {
+			position:absolute;
+			top:50%;
+			left:50%;
+			width:150%;
+
+			transition: all 0.75s linear;
+			@include vendor(transform, translate(-50%, -50%) scale(1));
+		}
+	}
+
+	&.hidden {
+		visibility:hidden;
+
+		.background {
+			opacity:0;
+		}
+
+		.img img {
+			@include vendor(transform, translate(-50%, -50%) scale(0));
 		}
 	}
 }

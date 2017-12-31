@@ -8,6 +8,10 @@ const RED_PIECE = require("./res/ch-r.png");
 const BLACK_KING = require("./res/ch-bl-k.png");
 const RED_KING = require("./res/ch-r-k.png");
 
+const VICTORY = require("./res/victory.png");
+const DEFEAT = require("./res/defeat.png");
+const BLANK = require("./res/blank.png");
+
 function Cell(props) {
     var content;
 
@@ -57,7 +61,8 @@ class Board extends Component {
             active: null,
             ongoing: true,
             history: [],
-            timestamp: -1 // timestamp of latest update
+            timestamp: -1, // timestamp of latest update
+            gameOver: ''
         };
 
         // bindings
@@ -68,6 +73,8 @@ class Board extends Component {
         this.handleSelectCell = this.handleSelectCell.bind(this);
         this.handleTurnEnd = this.handleTurnEnd.bind(this);
         this.handleUndo = this.handleUndo.bind(this);
+        this.buildAuxiliaryCells = this.buildAuxiliaryCells.bind(this);
+        this.checkWinner = this.checkWinner.bind(this);
     }
 
     componentWillMount() {
@@ -81,12 +88,17 @@ class Board extends Component {
             this.setState(snapshot.val(), () => {
                 this.props.toggleProgressBar(true); // force hide
 
-                var waiting = "Waiting on opponent...";
-                var proceed = "Your turn. You are ";
-                proceed = proceed.concat(this.props.role === 'r' ? "red." : "black.");
-                var message = snapshot.val().turn !== this.props.role ? waiting : proceed;
-                var type = snapshot.val().turn !== this.props.role ? "waiting" : "proceed";
-                this.props.toggleStatusMessage(message, true, type);
+                if (this.state.gameOver !== '') {
+                    this.props.showGameOverModal(this.state.gameOver === this.props.role);
+                    console.log(this.state.gameOver === this.props.role);
+                } else {
+                    var waiting = "Waiting on opponent...";
+                    var proceed = "Your turn. You are ";
+                    proceed = proceed.concat(this.props.role === 'r' ? "red." : "black.");
+                    var message = snapshot.val().turn !== this.props.role ? waiting : proceed;
+                    var type = snapshot.val().turn !== this.props.role ? "waiting" : "proceed";
+                    this.props.toggleStatusMessage(message, true, type);
+                }
             });
         });
     }
@@ -131,7 +143,10 @@ class Board extends Component {
         return Math.abs(r1 - r2);
     }
 
-    handleSelectCell(i) {
+    /*
+    i: the index of the cell we're currently considering
+    */
+    buildAuxiliaryCells(i) {
         var colour = this.state.cells[i].colour;
         var auxiliary = [i-9, i-18, i-7, i-14, i+7, i+14, i+9, i+18];
 
@@ -175,6 +190,12 @@ class Board extends Component {
             }
             return ele; // default
         });
+
+        return _auxiliary;
+    }
+
+    handleSelectCell(i) {
+        var _auxiliary = this.buildAuxiliaryCells(i);
 
         this.setState({
             selected: i,
@@ -309,14 +330,20 @@ class Board extends Component {
                 turn: this.state.turn === 'r' ? 'bl' : 'r',
                 history: [],
                 moves: 0,
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                gameOver: this.checkWinner()
             },
             // update Firebase board state
             () => {
                 db.child('rooms').child(this.props.roomId).child('state').set(this.state)
                 .then(() => {
-                    var message = "Waiting on opponent...";
-                    this.props.toggleStatusMessage(message, true, "waiting");
+                    if (this.state.gameOver === this.props.role) {
+                        this.props.toggleStatusMessage('', false, '');
+                        this.props.showGameOverModal(true);
+                    } else {
+                        var message = "Waiting on opponent...";
+                        this.props.toggleStatusMessage(message, true, 'waiting');
+                    }
                 });
             });
         }
@@ -338,6 +365,50 @@ class Board extends Component {
                 timestamp: history.timestamp
             });
         }
+    }
+
+    /*
+    There are two ways to win: either your opponent has lost all their pieces,
+    or your opponent can make no possible moves
+    */
+    checkWinner() {
+        /*
+        check if opponent has any more pieces. The current player cannot lose
+        a piece after their own move, so we don't need to bother checking
+        for a win, only for a win.
+        */
+        // check each cell for an opponent piece
+        var opponents = [];
+        for (var i=0; i<63; i++) {
+            if (this.state.cells[i] !== -1 && this.state.cells[i].colour !== this.props.role) {
+                opponents.push(i); // save this piece
+            }
+        }
+
+        var n = opponents.length;
+        if (n === 0) return this.props.role; // no opponent pieces left
+
+        /*
+        checking if the opponent has no possible moves to make is a little more
+        difficult, but we can use auxiliary cells for each element found from
+        the previous step
+        */
+        // if there are opponent pieces, build auxiliary cells array for each, and see
+        // if any has a valid cell to move to. If so, haven't won yet
+        var index;
+        var _auxiliary;
+        for (var i=0; i<n; i++) {
+            index = opponents[i];
+            _auxiliary = this.buildAuxiliaryCells(index);
+
+            for (var j=0; j<8; j++) {
+                if (_auxiliary[j] !== -1) {
+                    return ''; // if any auxiliary cells are valid destinations, then haven't won yet
+                }
+            }
+        }
+
+        return this.props.role;
     }
 
     render() {
@@ -416,6 +487,7 @@ class Checkers extends Component {
         }
 
         this.toggleStatusMessage = this.toggleStatusMessage.bind(this);
+        this.showGameOverModal = this.showGameOverModal.bind(this);
     }
 
     toggleStatusMessage(message, show, type) {
@@ -423,20 +495,47 @@ class Checkers extends Component {
             this.setState({
                 statusMessage: message,
                 showStatusMessage: true,
-                statusType: type
+                statusType: type,
+                gameOverModal: ''
             });
         } else {
             this.setState({showStatusMessage: false});
         }
     }
 
+    showGameOverModal(status) {
+        console.log("status");
+        console.log(status);
+        this.setState({
+            gameOverModal: status ? "victory" : "defeat"
+        });
+    }
+
     render() {
         var showStatusMessage = this.state.showStatusMessage ? "" : "hidden";
         var statusClasses = ["status", showStatusMessage, this.state.statusType];
-        
+
+        var modalVisibility = this.state.gameOverModal === '' ? "hidden" : "";
+
         return (
             <div id="checkers" className="container">
+                <div className={modalVisibility+" modal"}>
+                    <div className="background"></div>
+                    <div className="img center">
+                        <img
+                            className={this.state.gameOverModal+" center"}
+                            src=
+                            {
+                                this.state.gameOverModal === 'victory'
+                                    ? VICTORY
+                                    : (this.state.gameOverModal === 'defeat' ? DEFEAT : BLANK)
+                            }
+                            alt="modal" />
+                    </div>
+                </div>
+                
                 <Board
+                    showGameOverModal={this.showGameOverModal}
                     setToolbarTitle={this.props.setToolbarTitle}
                     toggleStatusMessage={this.toggleStatusMessage}
                     role={this.props.role}
